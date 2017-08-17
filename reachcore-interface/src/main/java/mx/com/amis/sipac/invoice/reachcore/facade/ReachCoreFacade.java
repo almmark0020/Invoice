@@ -17,6 +17,7 @@ import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.ArrayOfGuid;
 import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFiscalRequest;
 import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFiscalResponse;
 
+import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
 import mx.com.amis.sipac.invoice.reachcore.util.NetClientGet;
 import mx.gob.sat.cfdi.serializer.Comprobante;
@@ -118,8 +119,14 @@ public class ReachCoreFacade {
     return cancelInvoice(rfc, invoiceIds);
   }
 
-  public void getPdf() {
-    NetClientGet.get("https://go.reachcore.com/api/rest/Timbre/Get?uuid=1234567890&format=xml");
+  /**
+   * Retrieves a pdf file from reachcore's vault
+   * @param uuid The invoice id to be requested
+   * @return 
+   * @throws Exception
+   */
+  public FileResponse getPdf(String uuid) throws Exception {
+    return NetClientGet.getPdf(url, apiKey, uuid);
   }
 
   public String getUrl() {
