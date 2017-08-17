@@ -1,39 +1,45 @@
 package mx.com.amis.sipac.invoice.reachcore.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStream;
+
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.commons.io.IOUtils;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 
 public class NetClientGet {
-  public static void get(String svcUrl) {
-    try {
-      URL url = new URL(svcUrl);
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("GET");
-      conn.setRequestProperty("Accept", "application/json");
-      conn.setRequestProperty("RCApiKey", "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy");
+  public static FileResponse getPdf(String url, String apiKey, String uuid) throws Exception {
+    FileResponse resp = new FileResponse();
+    
+    Client client = Client.create();
+    WebResource webResource =client.resource(url);
+    MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
+    queryParams.add("uuid", uuid);
+    queryParams.add("format", "pdf");
 
-      if (conn.getResponseCode() != 200) {
-        throw new RuntimeException("Failed : HTTP error code : "
-            + conn.getResponseCode());
-      }
+    ClientResponse response = webResource.queryParams(queryParams)
+        .header("Content-Type", "application/pdf")
+        .header("RCApiKey", apiKey)
+        .get(ClientResponse.class);
+    
+    InputStream in = response.getEntityInputStream();
 
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          (conn.getInputStream())));
-
-      String output;
-      System.out.println("Output from Server .... \n");
-      while ((output = br.readLine()) != null) {
-        System.out.println(output);
-      }
-      conn.disconnect();
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    if(response.getStatus() == 200) {
+      byte[] bytes = IOUtils.toByteArray(in);
+      resp.setSuccess(true);
+      resp.setContents(bytes);
+    } else {
+      String jsonStr = response.getEntity(String.class);
+      resp.setSuccess(false);
+      resp.setErrorMsg(jsonStr);
     }
+    
+    return resp;
   }
 }
