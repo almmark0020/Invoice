@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.3.RELEASE</version>
+    <relativePath /> <!-- lookup parent from repository -->
+  </parent>
+
+  <groupId>mx.com.amis.sipac.invoice</groupId>
+  <artifactId>sipac-invoice-jobs</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>SIPAC Invoice - Quartz jobs</name>
+  <description>Sistema de Pagos entre Compañías - Procesos Lote para Ordenes de Pago</description>
+
+  <organization>
+    <name />
+    <url />
+  </organization>
+
+  <developers>
+    <developer>
+      <id>jorge.alberto</id>
+      <name>Jorge Alberto Virgen</name>
+      <email>jorge.alberto@prutech.com.mx</email>
+      <organization />
+      <roles>
+        <role>Architect</role>
+        <role>Team Leader</role>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>marco</id>
+      <name>Marco López</name>
+      <email>marco.antonio@prutech.com.mx</email>
+      <organization />
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Victor Garcia</name>
+      <email>victor@prutech.com.mx</email>
+      <organization />
+      <roles>
+        <role>Tester</role>
+      </roles>
+    </contributor>
+  </contributors>
+
+  <properties>
+    <project.build.environment>dev</project.build.environment>
+
+    <project.build.resourcesDirectory>${basedir}/src/main/resources</project.build.resourcesDirectory>
+    <project.build.dockerResourcesDirectory>${basedir}/src/main/docker</project.build.dockerResourcesDirectory>
+    <project.build.filterDirectory>${basedir}/src/main/filters</project.build.filterDirectory>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <start-class>mx.com.amis.sipac.JobsOrderApplication</start-class>
+    <java.version>1.8</java.version>
+    <maven>3.5.0</maven>
+
+    <lifecycle.mapping.version>1.0.0</lifecycle.mapping.version>
+    <properties.maven.plugin.version>1.0.0</properties.maven.plugin.version>
+    <docker.maven.plugin.version>0.4.13</docker.maven.plugin.version>
+    <docker.image.prefix>devopsprutech</docker.image.prefix>
+
+    <commons.lang3.version>3.4</commons.lang3.version>
+    <spring-kafka.version>1.2.1.RELEASE</spring-kafka.version>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+      <version>2.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- hot swapping, disable cache for template, enable live reload -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons.lang3.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>mx.com.amis.sipac.invoice</groupId>
+      <artifactId>sipac-invoice-persistence</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sourceforge.jtds</groupId>
+      <artifactId>jtds</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${project.build.resourcesDirectory}</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>${project.build.dockerResourcesDirectory}</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <filters>
+      <filter>${project.build.filterDirectory}/${project.build.environment}.properties</filter>
+    </filters>
+
+    <pluginManagement>
+      <plugins>
+        <!-- This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>${lifecycle.mapping.version}</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <versionRange>[${properties.maven.plugin.version},)</versionRange>
+                    <goals>
+                      <goal>read-project-properties</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <!-- Defining the plugin stack -->
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>${properties.maven.plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${project.build.filterDirectory}/${project.build.environment}.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>${docker.maven.plugin.version}</version>
+        <configuration>
+          <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+          <dockerDirectory>${project.build.outputDirectory}</dockerDirectory>
+          <resources>
+            <resource>
+              <targetPath>/</targetPath>
+              <directory>${project.build.directory}</directory>
+              <include>${project.build.finalName}.${project.packaging}</include>
+            </resource>
+          </resources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>local</id>
+
+      <properties>
+        <project.build.environment>local</project.build.environment>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>dev</id>
+
+      <properties>
+        <project.build.environment>dev</project.build.environment>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>qa</id>
+
+      <properties>
+        <project.build.environment>qa</project.build.environment>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>sit</id>
+
+      <properties>
+        <project.build.environment>sit</project.build.environment>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>uat</id>
+
+      <properties>
+        <project.build.environment>uat</project.build.environment>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>

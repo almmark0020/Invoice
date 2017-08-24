@@ -11,13 +11,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import mx.gob.sat.cfdi.serializer.Comprobante;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante;
 import mx.gob.sat.retencionpago.serializer.Retenciones;
 
 public class CfdiUtil {
   
   public static String formatCfdiToString(Comprobante compr) throws JAXBException {
-    JAXBContext context = JAXBContext.newInstance("mx.gob.sat.cfdi.serializer");
+    JAXBContext context = JAXBContext.newInstance("mx.gob.sat.cfdi.serializer.v33");
     Marshaller marshaller = context.createMarshaller();
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     StringWriter sw = new StringWriter();

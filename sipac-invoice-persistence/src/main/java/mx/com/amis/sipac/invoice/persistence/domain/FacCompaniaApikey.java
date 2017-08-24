@@ -13,81 +13,103 @@ import java.sql.Timestamp;
 @Table(name="FAC_COMPANIA_APIKEY")
 @NamedQuery(name="FacCompaniaApikey.findAll", query="SELECT f FROM FacCompaniaApikey f")
 public class FacCompaniaApikey implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="ID_COMPANIA_APIKEY")
-	private Long idCompaniaApikey;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  @Column(name="ID_COMPANIA_APIKEY")
+  private Long idCompaniaApikey;
 
-	@Column(name="ACTIVO")
-	private Boolean activo;
+  @Column(name="ACTIVO")
+  private Boolean activo;
 
-	@Column(name="APIKEY")
-	private String apikey;
+  @Column(name="APIKEY")
+  private String apikey;
 
-	@Column(name="FECHA_REGISTRO")
-	private Timestamp fechaRegistro;
+  @Column(name="FECHA_REGISTRO")
+  private Timestamp fechaRegistro;
 
-	//bi-directional many-to-one association to Compania
-	@ManyToOne
-	@JoinColumn(name="COMPANIA_ID")
-	private Compania compania;
+  @Column(name="FECHA_INICIO")
+  private Timestamp fechaInicio;
 
-	//bi-directional many-to-one association to FacUsuario
-	@ManyToOne
-	@JoinColumn(name="ID_USUARIO_REGISTRO")
-	private FacUsuario facUsuario;
+  @Column(name="FECHA_FIN")
+  private Timestamp fechaFin;
 
-	public FacCompaniaApikey() {
-	}
+  //bi-directional many-to-one association to Compania
+  @ManyToOne
+  @JoinColumn(name="COMPANIA_ID")
+  private Compania compania;
 
-	public Long getIdCompaniaApikey() {
-		return this.idCompaniaApikey;
-	}
+  //bi-directional many-to-one association to FacUsuario
+  @ManyToOne
+  @JoinColumn(name="ID_USUARIO_REGISTRO")
+  private FacUsuario facUsuario;
 
-	public void setIdCompaniaApikey(Long idCompaniaApikey) {
-		this.idCompaniaApikey = idCompaniaApikey;
-	}
+  public FacCompaniaApikey() {
+  }
 
-	public Boolean getActivo() {
-		return this.activo;
-	}
+  public Long getIdCompaniaApikey() {
+    return this.idCompaniaApikey;
+  }
 
-	public void setActivo(Boolean activo) {
-		this.activo = activo;
-	}
+  public void setIdCompaniaApikey(Long idCompaniaApikey) {
+    this.idCompaniaApikey = idCompaniaApikey;
+  }
 
-	public String getApikey() {
-		return this.apikey;
-	}
+  public Boolean getActivo() {
+    return this.activo;
+  }
 
-	public void setApikey(String apikey) {
-		this.apikey = apikey;
-	}
+  public void setActivo(Boolean activo) {
+    this.activo = activo;
+  }
 
-	public Timestamp getFechaRegistro() {
-		return this.fechaRegistro;
-	}
+  public String getApikey() {
+    return this.apikey;
+  }
 
-	public void setFechaRegistro(Timestamp fechaRegistro) {
-		this.fechaRegistro = fechaRegistro;
-	}
+  public void setApikey(String apikey) {
+    this.apikey = apikey;
+  }
 
-	public Compania getCompania() {
-		return this.compania;
-	}
+  public Timestamp getFechaRegistro() {
+    return this.fechaRegistro;
+  }
 
-	public void setCompania(Compania compania) {
-		this.compania = compania;
-	}
+  public void setFechaRegistro(Timestamp fechaRegistro) {
+    this.fechaRegistro = fechaRegistro;
+  }
 
-	public FacUsuario getFacUsuario() {
-		return this.facUsuario;
-	}
+  public Timestamp getFechaInicio() {
+    return fechaInicio;
+  }
 
-	public void setFacUsuario(FacUsuario facUsuario) {
-		this.facUsuario = facUsuario;
-	}
+  public void setFechaInicio(Timestamp fechaInicio) {
+    this.fechaInicio = fechaInicio;
+  }
+
+  public Timestamp getFechaFin() {
+    return fechaFin;
+  }
+
+  public void setFechaFin(Timestamp fechaFin) {
+    this.fechaFin = fechaFin;
+  }
+
+  public Compania getCompania() {
+    return this.compania;
+  }
+
+  public void setCompania(Compania compania) {
+    this.compania = compania;
+  }
+
+  public FacUsuario getFacUsuario() {
+    return this.facUsuario;
+  }
+
+  public void setFacUsuario(FacUsuario facUsuario) {
+    this.facUsuario = facUsuario;
+  }
 
 }

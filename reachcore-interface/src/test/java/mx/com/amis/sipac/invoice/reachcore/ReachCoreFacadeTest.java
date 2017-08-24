@@ -10,15 +10,13 @@ import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFis
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.facade.ReachCoreFacade;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
-import mx.gob.sat.cfdi.serializer.Comprobante;
-import mx.gob.sat.cfdi.serializer.Comprobante.Conceptos;
-import mx.gob.sat.cfdi.serializer.Comprobante.Conceptos.Concepto;
-import mx.gob.sat.cfdi.serializer.Comprobante.Emisor;
-import mx.gob.sat.cfdi.serializer.Comprobante.Emisor.RegimenFiscal;
-import mx.gob.sat.cfdi.serializer.Comprobante.Impuestos;
-import mx.gob.sat.cfdi.serializer.Comprobante.Receptor;
-import mx.gob.sat.cfdi.serializer.TUbicacion;
-import mx.gob.sat.cfdi.serializer.TUbicacionFiscal;
+
+import mx.gob.sat.cfdi.serializer.v33.Comprobante;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos.Concepto;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Emisor;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Impuestos;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Receptor;
 
 public class ReachCoreFacadeTest {
 
@@ -36,7 +34,7 @@ public class ReachCoreFacadeTest {
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String emitUrl = "https://oat.reachcore.com/api/ws/6.0/pacservices/Emision.svc/basic?wsdl";
     ReachCoreFacade facade = new ReachCoreFacade(emitUrl, apiKey);
-    Comprobante compr = buildMockComprobante();
+    Comprobante compr = buildMockComprobante33();
     EmitirComprobanteResponse resp = facade.emitInvoice(compr);
     System.out.println("resp: " + resp);
   }
@@ -51,7 +49,61 @@ public class ReachCoreFacadeTest {
     System.out.println("respCancelacion: " + respCan);
   }
   
-  private Comprobante buildMockComprobante() {
+  private Comprobante buildMockComprobante33() {
+    Comprobante compr =  new Comprobante();
+    compr.setVersion("3.3");
+
+    compr.setFecha(CfdiUtil.getXMLGregorianCalendar());
+    compr.setSubTotal(new BigDecimal(0));
+    compr.setTotal(new BigDecimal(0));
+    compr.setLugarExpedicion("México D.F.");
+
+    Emisor emisor = new Emisor();
+    emisor.setRfc("LOVM820913AA9");
+    emisor.setNombre("TEST");
+    emisor.setRegimenFiscal("01");
+//    RegimenFiscal regimen = new RegimenFiscal();
+//    regimen.setRegimen("Regimen Actividad Empresarial");
+    //emisor.getRegimenFiscal().add(regimen);
+//    TUbicacionFiscal domicilio = new TUbicacionFiscal();
+//    domicilio.setCalle("Calle Emisor Trial");
+//    domicilio.setMunicipio("Deleg/Mpio Emisor Trial");
+//    domicilio.setEstado("Distrito Federal Emisor Trial");
+//    domicilio.setPais("Mexico Emisor Trial");
+//    domicilio.setCodigoPostal("09876");
+//    emisor.setDomicilioFiscal(domicilio);
+    compr.setEmisor(emisor);
+
+    Receptor receptor = new Receptor();
+    receptor.setRfc("XAXX010101RC5");
+    receptor.setNombre("TEST RECEPTOR");
+//    TUbicacion dom = new TUbicacion();
+//    dom.setCalle("Calle Emisor Trial");
+//    dom.setMunicipio("Deleg/Mpio Emisor Trial");
+//    dom.setEstado("Distrito Federal Emisor Trial");
+//    dom.setPais("Mexico Emisor Trial");
+//    dom.setCodigoPostal("09876");
+//    receptor.setDomicilio(dom);
+    compr.setReceptor(receptor);
+
+    Concepto concepto = new Concepto();
+    concepto.setCantidad(new BigDecimal(1));
+    concepto.setUnidad("Unidad");
+    concepto.setDescripcion("Descripcion");
+    concepto.setValorUnitario(new BigDecimal(0));
+    concepto.setImporte(new BigDecimal(0));
+    Conceptos conceptos = new Conceptos();
+    conceptos.getConcepto().add(concepto);
+    compr.setConceptos(conceptos);
+
+    Impuestos impuestos = new Impuestos();
+    compr.setImpuestos(impuestos);
+
+    return compr;
+  }
+  
+  /*
+  private mx.gob.sat.cfdi.serializer.v32.Comprobante buildMockComprobante32() {
     Comprobante compr =  new Comprobante();
     compr.setVersion("3.2");
 
@@ -105,4 +157,5 @@ public class ReachCoreFacadeTest {
 
     return compr;
   }
+  */
 }
