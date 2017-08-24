@@ -1,6 +1,8 @@
 package mx.com.amis.sipac.invoice.persistence.domain;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 
 
@@ -12,68 +14,79 @@ import javax.persistence.*;
 @Table(name="FAC_PERIODO_EXTEMPORANEO")
 @NamedQuery(name="FacPeriodoExtemporaneo.findAll", query="SELECT f FROM FacPeriodoExtemporaneo f")
 public class FacPeriodoExtemporaneo implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="ID_PERIODO_EXTEMPORANEO")
-	private Long idPeriodoExtemporaneo;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  @Column(name="ID_PERIODO_EXTEMPORANEO")
+  private Long idPeriodoExtemporaneo;
 
-	@Column(name="ACTIVO")
-	private Boolean activo;
+  @Column(name="ACTIVO")
+  private Boolean activo;
 
-	@Column(name="NUMERO_DIAS")
-	private Integer numeroDias;
+  @Column(name="NUMERO_DIAS")
+  private Integer numeroDias;
 
-	@Column(name="PERIODO")
-	private Integer periodo;
+  @Column(name="PERIODO")
+  private Integer periodo;
 
-	//bi-directional many-to-one association to FacUsuario
-	@ManyToOne
-	@JoinColumn(name="ID_USUARIO_REGISTRO")
-	private FacUsuario facUsuario;
+  @Column(name="FECHA_REGISTRO")
+  private Timestamp fechaRegistro;
 
-	public FacPeriodoExtemporaneo() {
-	}
+  //bi-directional many-to-one association to FacUsuario
+  @ManyToOne
+  @JoinColumn(name="ID_USUARIO_REGISTRO")
+  private FacUsuario facUsuario;
 
-	public Long getIdPeriodoExtemporaneo() {
-		return this.idPeriodoExtemporaneo;
-	}
+  public FacPeriodoExtemporaneo() {
+  }
 
-	public void setIdPeriodoExtemporaneo(Long idPeriodoExtemporaneo) {
-		this.idPeriodoExtemporaneo = idPeriodoExtemporaneo;
-	}
+  public Long getIdPeriodoExtemporaneo() {
+    return this.idPeriodoExtemporaneo;
+  }
 
-	public Boolean getActivo() {
-		return this.activo;
-	}
+  public void setIdPeriodoExtemporaneo(Long idPeriodoExtemporaneo) {
+    this.idPeriodoExtemporaneo = idPeriodoExtemporaneo;
+  }
 
-	public void setActivo(Boolean activo) {
-		this.activo = activo;
-	}
+  public Boolean getActivo() {
+    return this.activo;
+  }
 
-	public Integer getNumeroDias() {
-		return this.numeroDias;
-	}
+  public void setActivo(Boolean activo) {
+    this.activo = activo;
+  }
 
-	public void setNumeroDias(Integer numeroDias) {
-		this.numeroDias = numeroDias;
-	}
+  public Integer getNumeroDias() {
+    return this.numeroDias;
+  }
 
-	public Integer getPeriodo() {
-		return this.periodo;
-	}
+  public void setNumeroDias(Integer numeroDias) {
+    this.numeroDias = numeroDias;
+  }
 
-	public void setPeriodo(Integer periodo) {
-		this.periodo = periodo;
-	}
+  public Integer getPeriodo() {
+    return this.periodo;
+  }
 
-	public FacUsuario getFacUsuario() {
-		return this.facUsuario;
-	}
+  public void setPeriodo(Integer periodo) {
+    this.periodo = periodo;
+  }
 
-	public void setFacUsuario(FacUsuario facUsuario) {
-		this.facUsuario = facUsuario;
-	}
+  public Timestamp getFechaRegistro() {
+    return fechaRegistro;
+  }
+
+  public void setFechaRegistro(Timestamp fechaRegistro) {
+    this.fechaRegistro = fechaRegistro;
+  }
+
+  public FacUsuario getFacUsuario() {
+    return this.facUsuario;
+  }
+
+  public void setFacUsuario(FacUsuario facUsuario) {
+    this.facUsuario = facUsuario;
+  }
 
 }
