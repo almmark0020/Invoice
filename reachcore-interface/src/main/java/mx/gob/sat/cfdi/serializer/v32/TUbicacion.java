@@ -6,7 +6,7 @@
 //
 
 
-package mx.gob.sat.cfdi.serializer;
+package mx.gob.sat.cfdi.serializer.v32;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -14,4 +14,4 @@
 //    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.UNQUALIFIED
 //    )
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.sat.gob.mx/cfd/3", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package mx.gob.sat.cfdi.serializer;
+package mx.gob.sat.cfdi.serializer.v32;

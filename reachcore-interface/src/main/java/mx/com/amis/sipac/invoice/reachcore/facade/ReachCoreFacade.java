@@ -20,7 +20,7 @@ import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFis
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
 import mx.com.amis.sipac.invoice.reachcore.util.NetClientGet;
-import mx.gob.sat.cfdi.serializer.Comprobante;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante;
 import mx.gob.sat.retencionpago.serializer.Retenciones;
 
 /**

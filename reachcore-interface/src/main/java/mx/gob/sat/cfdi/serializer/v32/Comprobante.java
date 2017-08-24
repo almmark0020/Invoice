@@ -6,7 +6,7 @@
 //
 
 
-package mx.gob.sat.cfdi.serializer;
+package mx.gob.sat.cfdi.serializer.v32;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

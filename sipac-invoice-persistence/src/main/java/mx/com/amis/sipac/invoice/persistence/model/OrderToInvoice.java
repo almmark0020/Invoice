@@ -10,16 +10,17 @@ public class OrderToInvoice implements Serializable {
   private String folio;
   private String tipoOrden;
   private Integer ciaDeudora;
-  private Integer ciaAcreecora;
+  private Integer ciaAcreedora;
   private Double monto;
   private String estatus;
   private Timestamp fechaEstatus;
   private String rfcDeudora;
-  private String razonsocialDeudora;
+  private String razonSocialDeudora;
   private String regimeFiscalDeudora;
   private String rfcAcreedora;
-  private String razonsocialAcreedora;
+  private String razonSocialAcreedora;
   private String regimeFiscalAcreedora;
+  private String apiKey;
   
   public Integer getSiniestroId() {
     return siniestroId;
@@ -45,11 +46,11 @@ public class OrderToInvoice implements Serializable {
   public void setCiaDeudora(Integer ciaDeudora) {
     this.ciaDeudora = ciaDeudora;
   }
-  public Integer getCiaAcreecora() {
-    return ciaAcreecora;
+  public Integer getCiaAcreedora() {
+    return ciaAcreedora;
   }
-  public void setCiaAcreecora(Integer ciaAcreecora) {
-    this.ciaAcreecora = ciaAcreecora;
+  public void setCiaAcreedora(Integer ciaAcreedora) {
+    this.ciaAcreedora = ciaAcreedora;
   }
   public Double getMonto() {
     return monto;
@@ -75,11 +76,11 @@ public class OrderToInvoice implements Serializable {
   public void setRfcDeudora(String rfcDeudora) {
     this.rfcDeudora = rfcDeudora;
   }
-  public String getRazonsocialDeudora() {
-    return razonsocialDeudora;
+  public String getRazonSocialDeudora() {
+    return razonSocialDeudora;
   }
-  public void setRazonsocialDeudora(String razonsocialDeudora) {
-    this.razonsocialDeudora = razonsocialDeudora;
+  public void setRazonSocialDeudora(String razonSocialDeudora) {
+    this.razonSocialDeudora = razonSocialDeudora;
   }
   public String getRegimeFiscalDeudora() {
     return regimeFiscalDeudora;
@@ -93,16 +94,22 @@ public class OrderToInvoice implements Serializable {
   public void setRfcAcreedora(String rfcAcreedora) {
     this.rfcAcreedora = rfcAcreedora;
   }
-  public String getRazonsocialAcreedora() {
-    return razonsocialAcreedora;
+  public String getRazonSocialAcreedora() {
+    return razonSocialAcreedora;
   }
-  public void setRazonsocialAcreedora(String razonsocialAcreedora) {
-    this.razonsocialAcreedora = razonsocialAcreedora;
+  public void setRazonSocialAcreedora(String razonSocialAcreedora) {
+    this.razonSocialAcreedora = razonSocialAcreedora;
   }
   public String getRegimeFiscalAcreedora() {
     return regimeFiscalAcreedora;
   }
   public void setRegimeFiscalAcreedora(String regimeFiscalAcreedora) {
     this.regimeFiscalAcreedora = regimeFiscalAcreedora;
+  }
+  public String getApiKey() {
+    return apiKey;
+  }
+  public void setApiKey(String apiKey) {
+    this.apiKey = apiKey;
   }
 }
