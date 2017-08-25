@@ -10,7 +10,9 @@ import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFis
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.facade.ReachCoreFacade;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
-
+import mx.gob.sat.cfdi.serializer.v33.CMoneda;
+import mx.gob.sat.cfdi.serializer.v33.CTipoDeComprobante;
+import mx.gob.sat.cfdi.serializer.v33.CUsoCFDI;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos.Concepto;
@@ -52,16 +54,18 @@ public class ReachCoreFacadeTest {
   private Comprobante buildMockComprobante33() {
     Comprobante compr =  new Comprobante();
     compr.setVersion("3.3");
+    compr.setTipoDeComprobante(CTipoDeComprobante.T);
+    compr.setMoneda(CMoneda.MXN);
 
     compr.setFecha(CfdiUtil.getXMLGregorianCalendar());
     compr.setSubTotal(new BigDecimal(0));
     compr.setTotal(new BigDecimal(0));
-    compr.setLugarExpedicion("México D.F.");
+    compr.setLugarExpedicion("08400");
 
     Emisor emisor = new Emisor();
-    emisor.setRfc("LOVM820913AA9");
-    emisor.setNombre("TEST");
-    emisor.setRegimenFiscal("01");
+    emisor.setRfc("AAA010101AAA");
+    emisor.setNombre("ACCEM SERVICIOS EMPRESARIALES SC");
+    emisor.setRegimenFiscal("601");
 //    RegimenFiscal regimen = new RegimenFiscal();
 //    regimen.setRegimen("Regimen Actividad Empresarial");
     //emisor.getRegimenFiscal().add(regimen);
@@ -75,8 +79,8 @@ public class ReachCoreFacadeTest {
     compr.setEmisor(emisor);
 
     Receptor receptor = new Receptor();
-    receptor.setRfc("XAXX010101RC5");
-    receptor.setNombre("TEST RECEPTOR");
+    receptor.setRfc("LOVM840920DI9");
+    receptor.setNombre("MARCO ANTONIO LOPEZ VARGAS");
 //    TUbicacion dom = new TUbicacion();
 //    dom.setCalle("Calle Emisor Trial");
 //    dom.setMunicipio("Deleg/Mpio Emisor Trial");
@@ -84,6 +88,7 @@ public class ReachCoreFacadeTest {
 //    dom.setPais("Mexico Emisor Trial");
 //    dom.setCodigoPostal("09876");
 //    receptor.setDomicilio(dom);
+    receptor.setUsoCFDI(CUsoCFDI.D_01);
     compr.setReceptor(receptor);
 
     Concepto concepto = new Concepto();
@@ -92,12 +97,15 @@ public class ReachCoreFacadeTest {
     concepto.setDescripcion("Descripcion");
     concepto.setValorUnitario(new BigDecimal(0));
     concepto.setImporte(new BigDecimal(0));
+    concepto.setClaveProdServ("01010101");
+    concepto.setClaveUnidad("H87");
+    
     Conceptos conceptos = new Conceptos();
     conceptos.getConcepto().add(concepto);
     compr.setConceptos(conceptos);
 
-    Impuestos impuestos = new Impuestos();
-    compr.setImpuestos(impuestos);
+//    Impuestos impuestos = new Impuestos();
+//    compr.setImpuestos(impuestos);
 
     return compr;
   }

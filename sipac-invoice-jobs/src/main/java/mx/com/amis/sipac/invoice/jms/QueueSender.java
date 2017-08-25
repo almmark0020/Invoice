@@ -22,7 +22,7 @@ public class QueueSender {
   @Autowired
   private KafkaTemplate<String, String> kafkaTemplate;
   
-  @Value("${kafka.topic.ordersToInvoice}")
+  @Value("${kafka.topic.invoice}")
   private String topic;
 
   public void send(OrderToInvoice order) {
