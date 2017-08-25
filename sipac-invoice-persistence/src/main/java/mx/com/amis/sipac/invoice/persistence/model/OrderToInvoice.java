@@ -3,9 +3,17 @@ package mx.com.amis.sipac.invoice.persistence.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class OrderToInvoice implements Serializable {
   private static final long serialVersionUID = -6447715092117918570L;
   
+  @Id
+  private String id;
+  
+  private Long invoiceOrderId;
   private Integer siniestroId;
   private String folio;
   private String tipoOrden;
@@ -22,6 +30,18 @@ public class OrderToInvoice implements Serializable {
   private String regimeFiscalAcreedora;
   private String apiKey;
   
+  public String getId() {
+    return id;
+  }
+  public void setId(String id) {
+    this.id = id;
+  }
+  public Long getInvoiceOrderId() {
+    return invoiceOrderId;
+  }
+  public void setInvoiceOrderId(Long invoiceOrderId) {
+    this.invoiceOrderId = invoiceOrderId;
+  }
   public Integer getSiniestroId() {
     return siniestroId;
   }

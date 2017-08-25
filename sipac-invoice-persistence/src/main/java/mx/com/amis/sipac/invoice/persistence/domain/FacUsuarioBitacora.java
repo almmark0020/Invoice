@@ -1,6 +1,7 @@
 package mx.com.amis.sipac.invoice.persistence.domain;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -54,9 +55,16 @@ public class FacUsuarioBitacora implements Serializable {
   @Column(name="TELEFONO")
   private String telefono;
   
+  @Column(name="FECHA_MODIFICACION")
+  private Timestamp fechaModificacion;
+  
   @ManyToOne
   @JoinColumn(name="ID_USUARIO")
   private FacUsuario facUsuario;
+  
+  @ManyToOne
+  @JoinColumn(name="ID_USUARIO_REGISTRO")
+  private FacUsuario usuarioRegistro;
 
   public FacUsuarioBitacora() {
   }
@@ -147,5 +155,21 @@ public class FacUsuarioBitacora implements Serializable {
 
   public void setFacUsuario(FacUsuario facUsuario) {
     this.facUsuario = facUsuario;
+  }
+
+  public Timestamp getFechaModificacion() {
+    return fechaModificacion;
+  }
+
+  public void setFechaModificacion(Timestamp fechaModificacion) {
+    this.fechaModificacion = fechaModificacion;
+  }
+
+  public FacUsuario getUsuarioRegistro() {
+    return usuarioRegistro;
+  }
+
+  public void setUsuarioRegistro(FacUsuario usuarioRegistro) {
+    this.usuarioRegistro = usuarioRegistro;
   }
 }
