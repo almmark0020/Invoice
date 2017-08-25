@@ -1,6 +1,7 @@
 package mx.com.amis.sipac.invoice.reachcore.util;
 
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -55,10 +56,8 @@ public class CfdiUtil {
   }
 
   public static XMLGregorianCalendar getXMLGregorianCalendar(Date date) {
-    GregorianCalendar c = new GregorianCalendar();
-    c.setTime(date);
     try {
-      return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+      return DatatypeFactory.newInstance().newXMLGregorianCalendar(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date));
     } catch (DatatypeConfigurationException e) {
       e.printStackTrace();
       return null;

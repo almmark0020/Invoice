@@ -13,96 +13,100 @@ import java.util.List;
 @Table(name="FAC_ESTATUS_FACTURACION")
 @NamedQuery(name="FacEstatusFacturacion.findAll", query="SELECT f FROM FacEstatusFacturacion f")
 public class FacEstatusFacturacion implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="ID_ESTATUS_FACTURACION")
-	private Integer idEstatusFacturacion;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  @Column(name="ID_ESTATUS_FACTURACION")
+  private Integer idEstatusFacturacion;
 
-	@Column(name="ACTIVO")
-	private Boolean activo;
+  @Column(name="ACTIVO")
+  private Boolean activo;
 
-	@Column(name="DESCRIPCION")
-	private String descripcion;
+  @Column(name="DESCRIPCION")
+  private String descripcion;
 
-	//bi-directional many-to-one association to FacMovimientoError
-	@OneToMany(mappedBy="facEstatusFacturacion")
-	private List<FacMovimientoError> facMovimientoErrors;
+  //bi-directional many-to-one association to FacMovimientoError
+  @OneToMany(mappedBy="facEstatusFacturacion")
+  private List<FacMovimientoError> facMovimientoErrors;
 
-	//bi-directional many-to-one association to FacMovimientoFacturacion
-	@OneToMany(mappedBy="facEstatusFacturacion")
-	private List<FacMovimientoFacturacion> facMovimientoFacturacions;
+  //bi-directional many-to-one association to FacMovimientoFacturacion
+  @OneToMany(mappedBy="facEstatusFacturacion")
+  private List<FacMovimientoFacturacion> facMovimientoFacturacions;
 
-	public FacEstatusFacturacion() {
-	}
+  public FacEstatusFacturacion() {
+  }
 
-	public Integer getIdEstatusFacturacion() {
-		return this.idEstatusFacturacion;
-	}
+  public FacEstatusFacturacion(Integer idEstatusFacturacion) {
+    this.idEstatusFacturacion = idEstatusFacturacion;
+  }
 
-	public void setIdEstatusFacturacion(Integer idEstatusFacturacion) {
-		this.idEstatusFacturacion = idEstatusFacturacion;
-	}
+  public Integer getIdEstatusFacturacion() {
+    return this.idEstatusFacturacion;
+  }
 
-	public Boolean getActivo() {
-		return this.activo;
-	}
+  public void setIdEstatusFacturacion(Integer idEstatusFacturacion) {
+    this.idEstatusFacturacion = idEstatusFacturacion;
+  }
 
-	public void setActivo(Boolean activo) {
-		this.activo = activo;
-	}
+  public Boolean getActivo() {
+    return this.activo;
+  }
 
-	public String getDescripcion() {
-		return this.descripcion;
-	}
+  public void setActivo(Boolean activo) {
+    this.activo = activo;
+  }
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+  public String getDescripcion() {
+    return this.descripcion;
+  }
 
-	public List<FacMovimientoError> getFacMovimientoErrors() {
-		return this.facMovimientoErrors;
-	}
+  public void setDescripcion(String descripcion) {
+    this.descripcion = descripcion;
+  }
 
-	public void setFacMovimientoErrors(List<FacMovimientoError> facMovimientoErrors) {
-		this.facMovimientoErrors = facMovimientoErrors;
-	}
+  public List<FacMovimientoError> getFacMovimientoErrors() {
+    return this.facMovimientoErrors;
+  }
 
-	public FacMovimientoError addFacMovimientoError(FacMovimientoError facMovimientoError) {
-		getFacMovimientoErrors().add(facMovimientoError);
-		facMovimientoError.setFacEstatusFacturacion(this);
+  public void setFacMovimientoErrors(List<FacMovimientoError> facMovimientoErrors) {
+    this.facMovimientoErrors = facMovimientoErrors;
+  }
 
-		return facMovimientoError;
-	}
+  public FacMovimientoError addFacMovimientoError(FacMovimientoError facMovimientoError) {
+    getFacMovimientoErrors().add(facMovimientoError);
+    facMovimientoError.setFacEstatusFacturacion(this);
 
-	public FacMovimientoError removeFacMovimientoError(FacMovimientoError facMovimientoError) {
-		getFacMovimientoErrors().remove(facMovimientoError);
-		facMovimientoError.setFacEstatusFacturacion(null);
+    return facMovimientoError;
+  }
 
-		return facMovimientoError;
-	}
+  public FacMovimientoError removeFacMovimientoError(FacMovimientoError facMovimientoError) {
+    getFacMovimientoErrors().remove(facMovimientoError);
+    facMovimientoError.setFacEstatusFacturacion(null);
 
-	public List<FacMovimientoFacturacion> getFacMovimientoFacturacions() {
-		return this.facMovimientoFacturacions;
-	}
+    return facMovimientoError;
+  }
 
-	public void setFacMovimientoFacturacions(List<FacMovimientoFacturacion> facMovimientoFacturacions) {
-		this.facMovimientoFacturacions = facMovimientoFacturacions;
-	}
+  public List<FacMovimientoFacturacion> getFacMovimientoFacturacions() {
+    return this.facMovimientoFacturacions;
+  }
 
-	public FacMovimientoFacturacion addFacMovimientoFacturacion(FacMovimientoFacturacion facMovimientoFacturacion) {
-		getFacMovimientoFacturacions().add(facMovimientoFacturacion);
-		facMovimientoFacturacion.setFacEstatusFacturacion(this);
+  public void setFacMovimientoFacturacions(List<FacMovimientoFacturacion> facMovimientoFacturacions) {
+    this.facMovimientoFacturacions = facMovimientoFacturacions;
+  }
 
-		return facMovimientoFacturacion;
-	}
+  public FacMovimientoFacturacion addFacMovimientoFacturacion(FacMovimientoFacturacion facMovimientoFacturacion) {
+    getFacMovimientoFacturacions().add(facMovimientoFacturacion);
+    facMovimientoFacturacion.setFacEstatusFacturacion(this);
 
-	public FacMovimientoFacturacion removeFacMovimientoFacturacion(FacMovimientoFacturacion facMovimientoFacturacion) {
-		getFacMovimientoFacturacions().remove(facMovimientoFacturacion);
-		facMovimientoFacturacion.setFacEstatusFacturacion(null);
+    return facMovimientoFacturacion;
+  }
 
-		return facMovimientoFacturacion;
-	}
+  public FacMovimientoFacturacion removeFacMovimientoFacturacion(FacMovimientoFacturacion facMovimientoFacturacion) {
+    getFacMovimientoFacturacions().remove(facMovimientoFacturacion);
+    facMovimientoFacturacion.setFacEstatusFacturacion(null);
+
+    return facMovimientoFacturacion;
+  }
 
 }
