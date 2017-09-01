@@ -12,10 +12,13 @@ public class OrderToInvoice implements Serializable {
   
   @Id
   private String id;
-  
   private Long invoiceOrderId;
   private Integer siniestroId;
   private String folio;
+  private String siniestroDeudor;
+  private String siniestroAcreedor;
+  private String polizaDeudor;
+  private String polizaAcreedor;
   private String tipoOrden;
   private Integer ciaDeudora;
   private Integer ciaAcreedora;
@@ -28,6 +31,7 @@ public class OrderToInvoice implements Serializable {
   private String rfcAcreedora;
   private String razonSocialAcreedora;
   private String regimeFiscalAcreedora;
+  private String cp;
   private String apiKey;
   
   public String getId() {
@@ -53,6 +57,30 @@ public class OrderToInvoice implements Serializable {
   }
   public void setFolio(String folio) {
     this.folio = folio;
+  }
+  public String getSiniestroDeudor() {
+    return siniestroDeudor;
+  }
+  public void setSiniestroDeudor(String siniestroDeudor) {
+    this.siniestroDeudor = siniestroDeudor;
+  }
+  public String getSiniestroAcreedor() {
+    return siniestroAcreedor;
+  }
+  public void setSiniestroAcreedor(String siniestroAcreedor) {
+    this.siniestroAcreedor = siniestroAcreedor;
+  }
+  public String getPolizaDeudor() {
+    return polizaDeudor;
+  }
+  public void setPolizaDeudor(String polizaDeudor) {
+    this.polizaDeudor = polizaDeudor;
+  }
+  public String getPolizaAcreedor() {
+    return polizaAcreedor;
+  }
+  public void setPolizaAcreedor(String polizaAcreedor) {
+    this.polizaAcreedor = polizaAcreedor;
   }
   public String getTipoOrden() {
     return tipoOrden;
@@ -125,6 +153,12 @@ public class OrderToInvoice implements Serializable {
   }
   public void setRegimeFiscalAcreedora(String regimeFiscalAcreedora) {
     this.regimeFiscalAcreedora = regimeFiscalAcreedora;
+  }
+  public String getCp() {
+    return cp;
+  }
+  public void setCp(String cp) {
+    this.cp = cp;
   }
   public String getApiKey() {
     return apiKey;

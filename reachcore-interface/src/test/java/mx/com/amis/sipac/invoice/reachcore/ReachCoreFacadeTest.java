@@ -1,7 +1,9 @@
 package mx.com.amis.sipac.invoice.reachcore;
 
+import java.io.File;
 import java.math.BigDecimal;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import com.reachcore.services.api.ws.pacservices._6.EmitirComprobanteResponse;
@@ -10,6 +12,7 @@ import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFis
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.facade.ReachCoreFacade;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Complemento;
 import mx.gob.sat.cfdi.serializer.v33.CMoneda;
 import mx.gob.sat.cfdi.serializer.v33.CTipoDeComprobante;
 import mx.gob.sat.cfdi.serializer.v33.CUsoCFDI;
@@ -17,17 +20,17 @@ import mx.gob.sat.cfdi.serializer.v33.Comprobante;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos.Concepto;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Emisor;
-import mx.gob.sat.cfdi.serializer.v33.Comprobante.Impuestos;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Receptor;
 
 public class ReachCoreFacadeTest {
 
-  @Test
+//  @Test
   public void getPdf() throws Exception {
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String url = "https://oat.reachcore.com/api/rest/Timbre/Get";
     ReachCoreFacade facade = new ReachCoreFacade(url, apiKey);
-    FileResponse response = facade.getPdf("F9123206-D86C-49EE-80F3-C288CC948631");
+    FileResponse response = facade.getPdf("27A59B95-7288-4EDB-BEFC-B65458C742F2");
+    FileUtils.writeByteArrayToFile(new File("/home/almmark0020/test/27A59B95-7288-4EDB-BEFC-B65458C742F2.pdf"), response.getContents());
     System.out.println("response: " + response);
   }
   
@@ -39,9 +42,17 @@ public class ReachCoreFacadeTest {
     Comprobante compr = buildMockComprobante33();
     EmitirComprobanteResponse resp = facade.emitInvoice(compr);
     System.out.println("resp: " + resp);
+    
+    compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
+    for (Complemento compl : compr.getComplemento()) {
+      System.out.println("UUID: " + compl.getUUID());
+      for (Object any : compl.getAny()) {
+        System.out.println("compl: " + any.toString());
+      }
+    }
   }
 
-  @Test
+//  @Test
   public void cancel() throws Exception {
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String cancelUrl = "https://oat.reachcore.com/api/ws/timbre-fiscal/Cancelacion.svc/basic?wsdl";

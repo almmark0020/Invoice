@@ -11,14 +11,18 @@ package mx.gob.sat.cfdi.serializer.v33;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import mx.gob.sat.cfdi.serializer.complemento.timbreFiscal.TimbreFiscalDigital;
 
 
 /**
@@ -1476,6 +1480,9 @@ public class Comprobante {
 
         @XmlAnyElement(lax = true)
         protected List<Object> any;
+        
+        @XmlTransient
+        protected String UUID;
 
         /**
          * Gets the value of the any property.
@@ -1505,6 +1512,31 @@ public class Comprobante {
             }
             return this.any;
         }
+        
+        public String getUUID() {
+          TimbreFiscalDigital tfd = getTimbreFiscalDigital();
+          return tfd == null ? "" : tfd.getUUID();
+      }
+      
+      public java.util.Date getFechaTimbrado() {
+          TimbreFiscalDigital tfd = getTimbreFiscalDigital();
+          if (tfd != null && tfd.getFechaTimbrado() != null) {
+              return tfd.getFechaTimbrado().toGregorianCalendar().getTime();
+          }
+          return null;
+      }
+      
+      public TimbreFiscalDigital getTimbreFiscalDigital() {
+          if (any != null && !any.isEmpty() && any.get(0) instanceof TimbreFiscalDigital) {
+              TimbreFiscalDigital tfd = (TimbreFiscalDigital) any.get(0);
+              return tfd;
+          }
+          return null;
+      }
+      
+      public void setUUID(String UUID) {
+          this.UUID = UUID;
+      }
 
     }
 

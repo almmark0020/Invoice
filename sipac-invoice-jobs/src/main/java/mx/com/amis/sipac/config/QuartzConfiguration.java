@@ -26,18 +26,69 @@ public class QuartzConfiguration {
     stFactory.setStartDelay(3000);
     stFactory.setName("mytrigger");
     stFactory.setGroup("mygroup");
-    //stFactory.setCronExpression("0 0/1 * 1/1 * ? *");
-    //stFactory.setCronExpression("0 15 10 ? * MON-FRI"); //1 am
-    stFactory.setCronExpression("15 0/2 * * * ?"); // every 2 minutes
-    //.withSchedule(cronSchedule("15 0/2 * * * ?"))
+    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
     return stFactory;
   }
-
+  
   @Bean
   public SchedulerFactoryBean schedulerFactoryBean() {
     SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
     System.out.println("Iniciando el llamado ......");
     scheduler.setTriggers(cronTriggerFactoryBean().getObject());
+    return scheduler;
+  }
+  
+  @Bean
+  public MethodInvokingJobDetailFactoryBean methodInvokingCancelInvoicesJob() {
+    MethodInvokingJobDetailFactoryBean obj = new MethodInvokingJobDetailFactoryBean();
+    obj.setTargetBeanName("cancelInvoicesJob");
+    obj.setTargetMethod("process");
+    return obj;
+  }
+  
+  @Bean
+  public CronTriggerFactoryBean cronTriggerCancelFactoryBean(){
+    CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
+    stFactory.setJobDetail(methodInvokingCancelInvoicesJob().getObject()); //Registrado
+    stFactory.setStartDelay(3000);
+    stFactory.setName("mytrigger2");
+    stFactory.setGroup("mygroup2");
+    stFactory.setCronExpression("0 0/5 * * * ?"); // every minute
+    return stFactory;
+  }
+
+  @Bean
+  public SchedulerFactoryBean schedulerCancelFactoryBean() {
+    SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
+    System.out.println("Iniciando el llamado ......");
+    scheduler.setTriggers(cronTriggerCancelFactoryBean().getObject());
+    return scheduler;
+  }
+  
+  @Bean
+  public MethodInvokingJobDetailFactoryBean methodInvokingComplementInvoicesJob() {
+    MethodInvokingJobDetailFactoryBean obj = new MethodInvokingJobDetailFactoryBean();
+    obj.setTargetBeanName("paymentComplementJob");
+    obj.setTargetMethod("process");
+    return obj;
+  }
+  
+  @Bean
+  public CronTriggerFactoryBean cronTriggerComplementFactoryBean(){
+    CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
+    stFactory.setJobDetail(methodInvokingComplementInvoicesJob().getObject()); //Registrado
+    stFactory.setStartDelay(3000);
+    stFactory.setName("mytrigger3");
+    stFactory.setGroup("mygroup3");
+    stFactory.setCronExpression("0 0/5 * * * ?"); // every minute
+    return stFactory;
+  }
+
+  @Bean
+  public SchedulerFactoryBean schedulerComplementFactoryBean() {
+    SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
+    System.out.println("Iniciando el llamado ......");
+    scheduler.setTriggers(cronTriggerComplementFactoryBean().getObject());
     return scheduler;
   }
 }
