@@ -6,9 +6,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import mx.com.amis.sipac.invoice.jms.QueueSender;
+import mx.com.amis.sipac.invoice.jms.Sender;
 import mx.com.amis.sipac.invoice.persistence.domain.Compania;
 import mx.com.amis.sipac.invoice.persistence.domain.FacOrdenFacturada;
 import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
@@ -16,13 +17,16 @@ import mx.com.amis.sipac.invoice.persistence.repository.InvoiceOrdersRepository;
 
 @Service("jobsRegManageOrders")
 public class JobsRegManageOrders {
-  private static final Logger logger = LoggerFactory.getLogger(QueueSender.class);
+  private static final Logger logger = LoggerFactory.getLogger(JobsRegManageOrders.class);
+  
+  @Value("${kafka.topic.invoice}")
+  private String topic;
   
   @Autowired(required = true)
   private InvoiceOrdersRepository repository;
   
   @Autowired(required = true)
-  private QueueSender sender;
+  private Sender sender;
 
   public void procesaRegistrado() {
     logger.debug("Start quartz process...");
@@ -30,9 +34,9 @@ public class JobsRegManageOrders {
     for(OrderToInvoice order : orders) {
       Long id = registerInvoiceOrder(order);
       order.setInvoiceOrderId(id);
-      sender.send(order);
+      sender.send(order, topic);
     }
-    sendMock();
+//    sendMock();
     logger.debug("End quartz process.");
   }
   
@@ -51,7 +55,7 @@ public class JobsRegManageOrders {
     OrderToInvoice order = buildMockOrder();
     Long id = registerInvoiceOrder(order);
     order.setInvoiceOrderId(id);
-    sender.send(order);
+    sender.send(order, topic);
   }
   
   private OrderToInvoice buildMockOrder() {

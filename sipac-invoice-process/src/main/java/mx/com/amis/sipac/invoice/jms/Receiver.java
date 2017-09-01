@@ -3,6 +3,7 @@ package mx.com.amis.sipac.invoice.jms;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.reachcore.services.api.ws.pacservices._6.EmitirComprobanteResponse;
@@ -20,10 +20,12 @@ import mx.com.amis.sipac.invoice.persistence.domain.FacEstatusFacturacion;
 import mx.com.amis.sipac.invoice.persistence.domain.FacMovimientoError;
 import mx.com.amis.sipac.invoice.persistence.domain.FacMovimientoFacturacion;
 import mx.com.amis.sipac.invoice.persistence.domain.FacOrdenFacturada;
+import mx.com.amis.sipac.invoice.persistence.model.EmailToNotify;
 import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
 import mx.com.amis.sipac.invoice.persistence.repository.InvoiceOrdersRepository;
 import mx.com.amis.sipac.invoice.reachcore.facade.ReachCoreFacade;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
+import mx.com.amis.sipac.service.MailService;
 import mx.gob.sat.cfdi.serializer.v33.CMoneda;
 import mx.gob.sat.cfdi.serializer.v33.CTipoDeComprobante;
 import mx.gob.sat.cfdi.serializer.v33.CUsoCFDI;
@@ -33,9 +35,8 @@ import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos.Concepto;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Emisor;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Receptor;
 
-@Service
-public class QueueReceiver {
-  private static final Logger logger = LoggerFactory.getLogger(QueueReceiver.class);
+public class Receiver {
+  private static final Logger logger = LoggerFactory.getLogger(Receiver.class);
 
   private CountDownLatch latch = new CountDownLatch(1);
 
@@ -46,20 +47,27 @@ public class QueueReceiver {
   @Value("${reachcore.emision.url}")
   private String reachCoreEmitUrl;
   
-  @Autowired
-  private InvoiceOrdersRepository repository;
+  @Autowired private InvoiceOrdersRepository repository;
+  @Autowired private MailService mailService;
 
   @KafkaListener(topics = "${kafka.topic.invoice}")
   public void receive(String message) {
     logger.info("received message='{}'", message);
+    EmitirComprobanteResponse resp = null;
     OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
+    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
     try {
-      processOrder(order);
-      EmitirComprobanteResponse resp = processOrder(order);
-      buildInvoiceMovement(order, resp, EstatusFacturacionEnum.FACTURA);
+      resp = processOrder(order);
+      if (resp != null && resp.getError() == null) {
+        buildInvoiceMovement(order, resp, EstatusFacturacionEnum.FACTURA);
+        this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order));
+      } else {
+        buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.FACTURA);
+        this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order, resp.getError().toString()));
+      }
     } catch (Exception e) {
       e.printStackTrace();
-      buildInvoiceError(order, EstatusFacturacionEnum.FACTURA);
+      buildInvoiceError(e.getMessage(), order, EstatusFacturacionEnum.FACTURA);
       // sendErrorEmail
     }
     latch.countDown();
@@ -79,10 +87,9 @@ public class QueueReceiver {
     Comprobante compr =  new Comprobante();
     compr.setVersion("3.3");
 
-    // TODO get correct values
-    compr.setTipoDeComprobante(CTipoDeComprobante.T);
+    compr.setTipoDeComprobante(CTipoDeComprobante.I);
     compr.setMoneda(CMoneda.MXN);
-    compr.setLugarExpedicion("08400");
+    compr.setLugarExpedicion(order.getCp());
 
     compr.setFecha(CfdiUtil.getXMLGregorianCalendar());
     compr.setSubTotal(new BigDecimal(order.getMonto()));
@@ -97,18 +104,21 @@ public class QueueReceiver {
     Receptor receptor = new Receptor();
     receptor.setRfc(order.getRfcDeudora());
     receptor.setNombre(order.getRazonSocialDeudora());
-    receptor.setUsoCFDI(CUsoCFDI.D_01); // TODO get correct value
+    receptor.setUsoCFDI(CUsoCFDI.P_01);
     compr.setReceptor(receptor);
 
     Concepto concepto = new Concepto();
     concepto.setCantidad(new BigDecimal(1));
     concepto.setValorUnitario(new BigDecimal(order.getMonto()));
     concepto.setImporte(new BigDecimal(order.getMonto()));
-    // TODO get correct values
-    concepto.setUnidad("Unidad");
-    concepto.setDescripcion("Descripcion");
-    concepto.setClaveProdServ("01010101");
-    concepto.setClaveUnidad("H87");
+    concepto.setUnidad("Unidad de Servicio");
+    concepto.setDescripcion("Folio: " + order.getFolio() 
+    + " - SIN DEUDOR: "  + order.getSiniestroDeudor() 
+    + " - POLIZA DEUDOR: " + order.getPolizaDeudor()
+    + " - SIN ACREEDOR: " + order.getSiniestroAcreedor()
+    + " - POLIZA ACREEDOR: " + order.getPolizaAcreedor());
+    concepto.setClaveProdServ("84131503");
+    concepto.setClaveUnidad("E48");
 
     Conceptos conceptos = new Conceptos();
     conceptos.getConcepto().add(concepto);
@@ -120,22 +130,24 @@ public class QueueReceiver {
     return compr;
   }
   
-  private FacMovimientoFacturacion buildInvoiceMovement(OrderToInvoice order, EmitirComprobanteResponse resp, EstatusFacturacionEnum status) {
+  private FacMovimientoFacturacion buildInvoiceMovement(OrderToInvoice order, EmitirComprobanteResponse resp, EstatusFacturacionEnum status) throws Exception {
     FacMovimientoFacturacion mov = new FacMovimientoFacturacion();
     mov.setFacOrdenFacturada(new FacOrdenFacturada(order.getInvoiceOrderId()));
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
-    mov.setUuid(resp.getTransactionId());
+    Comprobante compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
+    mov.setUuid(compr.getComplemento().get(0).getUUID());
     mov.setCfdiXml(resp.getResult());
     mov = repository.registerInvoiceMovement(mov);
     return mov;
   }
   
-  private FacMovimientoError buildInvoiceError(OrderToInvoice order, EstatusFacturacionEnum status) {
+  private FacMovimientoError buildInvoiceError(String errorMsg, OrderToInvoice order, EstatusFacturacionEnum status) {
     FacMovimientoError mov = new FacMovimientoError();
     mov.setFacOrdenFacturada(new FacOrdenFacturada(order.getInvoiceOrderId()));
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
+    mov.setMensajeError(errorMsg);
     mov = repository.registerInvoiceMovement(mov);
     return mov;
   }

@@ -1,13 +1,14 @@
 package mx.com.amis.sipac.invoice.reachcore.util;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -17,6 +18,18 @@ import mx.gob.sat.retencionpago.serializer.Retenciones;
 
 public class CfdiUtil {
   
+  public static Comprobante getComprobanteFromXml(String xml) throws JAXBException {
+    JAXBContext context = JAXBContext.newInstance("mx.gob.sat.cfdi.serializer.v33");
+    Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
+    StringReader reader = new StringReader(xml);
+    
+//    JAXBElement<Comprobante> unmarshalledObject = 
+//        (JAXBElement<Comprobante>)jaxbUnmarshaller.unmarshal(reader);
+    
+    Comprobante comprobante = (Comprobante) jaxbUnmarshaller.unmarshal(reader);
+    return comprobante;
+  }
+  
   public static String formatCfdiToString(Comprobante compr) throws JAXBException {
     JAXBContext context = JAXBContext.newInstance("mx.gob.sat.cfdi.serializer.v33");
     Marshaller marshaller = context.createMarshaller();
@@ -24,12 +37,6 @@ public class CfdiUtil {
     StringWriter sw = new StringWriter();
     marshaller.marshal(compr, sw);
     return normalizeUriNamespace(sw.toString(), "cfdi");
-//    String cfdi = sw.toString();
-//    cfdi = cfdi.replace("xmlns=", "xmlns:cfdi=");
-//    cfdi = cfdi.replace("<", "<cfdi:");
-//    cfdi = cfdi.replace("<cfdi:?", "<?");
-//    cfdi = cfdi.replace("<cfdi:/", "</cfdi:");
-//    return cfdi;
   }
   
   public static String formatCfdiToString(Retenciones compr) throws JAXBException {
@@ -39,12 +46,6 @@ public class CfdiUtil {
     StringWriter sw = new StringWriter();
     marshaller.marshal(compr, sw);
     return normalizeUriNamespace(sw.toString(), "retenciones");
-//    String cfdi = sw.toString();
-//    cfdi = cfdi.replace("xmlns=", "xmlns:retenciones=");
-//    cfdi = cfdi.replace("<", "<retenciones:");
-//    cfdi = cfdi.replace("<retenciones:?", "<?");
-//    cfdi = cfdi.replace("<retenciones:/", "</retenciones:");
-//    return cfdi;
   }
   
   private static String normalizeUriNamespace(String xml, String uri) {

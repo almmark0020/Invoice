@@ -10,6 +10,8 @@ package mx.gob.sat.cfdi.serializer.v33;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
+import mx.gob.sat.cfdi.serializer.complemento.timbreFiscal.TimbreFiscalDigital;
+
 
 /**
  * This object contains factory methods for each 
@@ -227,5 +229,9 @@ public class ObjectFactory {
     public Comprobante.CfdiRelacionados.CfdiRelacionado createComprobanteCfdiRelacionadosCfdiRelacionado() {
         return new Comprobante.CfdiRelacionados.CfdiRelacionado();
     }
+    
+    public TimbreFiscalDigital createTimbreFiscalDigital() {
+      return new TimbreFiscalDigital();
+  }
 
 }
