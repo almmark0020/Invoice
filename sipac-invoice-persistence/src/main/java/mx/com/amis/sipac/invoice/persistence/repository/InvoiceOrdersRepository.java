@@ -42,6 +42,13 @@ public class InvoiceOrdersRepository {
     return orders;
   }
   
+  public List<OrderToInvoice> getRefundOrdersToInvoice() {
+    List<OrderToInvoice> orders = new ArrayList<OrderToInvoice>();
+    orders.addAll(getRefundOrders(OrderTypeEnum.DANOS_MATERIALES.getTypeId()));
+    //orders.addAll(getRefundOrders(OrderTypeEnum.GASTOS_MEDICOS.getTypeId()));
+    return orders;
+  }
+  
   public List<OrderToInvoice> getCancelledOrdersToInvoice() {
     List<OrderToInvoice> orders = new ArrayList<OrderToInvoice>();
     orders.addAll(getCancelledOrders(OrderTypeEnum.DANOS_MATERIALES.getTypeId()));

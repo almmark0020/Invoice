@@ -3,13 +3,19 @@ package mx.com.amis.sipac.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+//import org.springframework.mail.javamail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import mx.com.amis.sipac.invoice.persistence.model.EmailToNotify;
@@ -19,7 +25,7 @@ import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
 public class MailService {
   private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
-  @Autowired private MailSender mailSender;
+  @Autowired private JavaMailSender mailSender;
   private SimpleMailMessage templateMessage;
 
   @Value("${send.from.email}")
@@ -28,7 +34,7 @@ public class MailService {
   public String builEmailBody(OrderToInvoice order) {
     return builEmailBody(order, null);
   }
-  
+
   public String builEmailBody(OrderToInvoice order, String errorMsg) {
 
     StringBuffer sb = new StringBuffer();
@@ -92,7 +98,24 @@ public class MailService {
     logger.debug("Finished Send...");
     return "OK";
   }
-  
+
+  public void sendMessageWithAttachment(
+      List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf) throws MessagingException {
+    MimeMessage message = mailSender.createMimeMessage();
+
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+    helper.setTo(getEmails(toEmail));
+    helper.setFrom(this.fromEmail);
+    helper.setSubject(subject);
+    helper.setText(text);
+
+    helper.addAttachment("XML.xml", new ByteArrayResource(xml));
+    helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
+
+    mailSender.send(message);
+  }
+
   private String[] getEmails(List<EmailToNotify> emailsToNotify) {
     List<String> emails = new ArrayList<String>();
     for(EmailToNotify email : emailsToNotify) {

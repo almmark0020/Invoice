@@ -6,7 +6,7 @@
 //
 
 
-package mx.gob.sat.cfdi.serializer.complemento.pagos;
+package mx.gob.sat.cfdi.serializer.v33;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
