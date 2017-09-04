@@ -12,6 +12,7 @@ public class OrderToInvoice implements Serializable {
   
   @Id
   private String id;
+  
   private Long invoiceOrderId;
   private Integer siniestroId;
   private String folio;

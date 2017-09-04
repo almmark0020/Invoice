@@ -52,7 +52,7 @@ public class InvoiceOrdersRepository {
   @SuppressWarnings("unchecked")
   public List<OrderToInvoice> getOrdersToInvoice(String orderType) {
     logger.debug("getOrdersToInvoice...");
-    String queryString = "select "
+    String queryString = "select 0 as \"invoiceOrderId\", "
         + " (CONVERT(VARCHAR, sin.SINIESTRO_ID) + ord.FOLIO_ORDEN + 'D') as id,"
         + " sin.SINIESTRO_ID as \"siniestroId\","
         + " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
