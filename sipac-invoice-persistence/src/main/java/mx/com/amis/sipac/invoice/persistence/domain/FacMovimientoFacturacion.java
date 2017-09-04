@@ -13,81 +13,92 @@ import java.sql.Timestamp;
 @Table(name="FAC_MOVIMIENTO_FACTURACION")
 @NamedQuery(name="FacMovimientoFacturacion.findAll", query="SELECT f FROM FacMovimientoFacturacion f")
 public class FacMovimientoFacturacion implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="ID_MOVIMIENTO_FACTURACION")
-	private Long idMovimientoFacturacion;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  @Column(name="ID_MOVIMIENTO_FACTURACION")
+  private Long idMovimientoFacturacion;
 
-	@Column(name="CFDI_XML")
-	private String cfdiXml;
+  @Column(name="CFDI_XML")
+  private String cfdiXml;
 
-	@Column(name="FECHA_MOVIMIENTO")
-	private Timestamp fechaMovimiento;
+  @Transient
+  private byte[] pdf;
 
-	@Column(name="UUID")
-	private String uuid;
+  @Column(name="FECHA_MOVIMIENTO")
+  private Timestamp fechaMovimiento;
 
-	//bi-directional many-to-one association to FacEstatusFacturacion
-	@ManyToOne
-	@JoinColumn(name="ID_ESTATUS_FACTURACION")
-	private FacEstatusFacturacion facEstatusFacturacion;
+  @Column(name="UUID")
+  private String uuid;
 
-	//bi-directional many-to-one association to FacOrdenFacturada
-	@ManyToOne
-	@JoinColumn(name="ID_ORDEN_FACTURADA")
-	private FacOrdenFacturada facOrdenFacturada;
+  //bi-directional many-to-one association to FacEstatusFacturacion
+  @ManyToOne
+  @JoinColumn(name="ID_ESTATUS_FACTURACION")
+  private FacEstatusFacturacion facEstatusFacturacion;
 
-	public FacMovimientoFacturacion() {
-	}
+  //bi-directional many-to-one association to FacOrdenFacturada
+  @ManyToOne
+  @JoinColumn(name="ID_ORDEN_FACTURADA")
+  private FacOrdenFacturada facOrdenFacturada;
 
-	public Long getIdMovimientoFacturacion() {
-		return this.idMovimientoFacturacion;
-	}
+  public FacMovimientoFacturacion() {
+  }
 
-	public void setIdMovimientoFacturacion(Long idMovimientoFacturacion) {
-		this.idMovimientoFacturacion = idMovimientoFacturacion;
-	}
+  public Long getIdMovimientoFacturacion() {
+    return this.idMovimientoFacturacion;
+  }
 
-	public String getCfdiXml() {
-		return this.cfdiXml;
-	}
+  public void setIdMovimientoFacturacion(Long idMovimientoFacturacion) {
+    this.idMovimientoFacturacion = idMovimientoFacturacion;
+  }
 
-	public void setCfdiXml(String cfdiXml) {
-		this.cfdiXml = cfdiXml;
-	}
+  public String getCfdiXml() {
+    return this.cfdiXml;
+  }
 
-	public Timestamp getFechaMovimiento() {
-		return this.fechaMovimiento;
-	}
+  public void setCfdiXml(String cfdiXml) {
+    this.cfdiXml = cfdiXml;
+  }
 
-	public void setFechaMovimiento(Timestamp fechaMovimiento) {
-		this.fechaMovimiento = fechaMovimiento;
-	}
+  public Timestamp getFechaMovimiento() {
+    return this.fechaMovimiento;
+  }
 
-	public String getUuid() {
-		return this.uuid;
-	}
+  public void setFechaMovimiento(Timestamp fechaMovimiento) {
+    this.fechaMovimiento = fechaMovimiento;
+  }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+  public String getUuid() {
+    return this.uuid;
+  }
 
-	public FacEstatusFacturacion getFacEstatusFacturacion() {
-		return this.facEstatusFacturacion;
-	}
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
+  }
 
-	public void setFacEstatusFacturacion(FacEstatusFacturacion facEstatusFacturacion) {
-		this.facEstatusFacturacion = facEstatusFacturacion;
-	}
+  public FacEstatusFacturacion getFacEstatusFacturacion() {
+    return this.facEstatusFacturacion;
+  }
 
-	public FacOrdenFacturada getFacOrdenFacturada() {
-		return this.facOrdenFacturada;
-	}
+  public void setFacEstatusFacturacion(FacEstatusFacturacion facEstatusFacturacion) {
+    this.facEstatusFacturacion = facEstatusFacturacion;
+  }
 
-	public void setFacOrdenFacturada(FacOrdenFacturada facOrdenFacturada) {
-		this.facOrdenFacturada = facOrdenFacturada;
-	}
+  public FacOrdenFacturada getFacOrdenFacturada() {
+    return this.facOrdenFacturada;
+  }
+
+  public void setFacOrdenFacturada(FacOrdenFacturada facOrdenFacturada) {
+    this.facOrdenFacturada = facOrdenFacturada;
+  }
+
+  public byte[] getPdf() {
+    return pdf;
+  }
+
+  public void setPdf(byte[] pdf) {
+    this.pdf = pdf;
+  }
 
 }

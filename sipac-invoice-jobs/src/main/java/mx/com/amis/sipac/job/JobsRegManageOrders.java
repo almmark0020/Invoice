@@ -55,13 +55,15 @@ public class JobsRegManageOrders {
     OrderToInvoice order = buildMockOrder();
     Long id = registerInvoiceOrder(order);
     order.setInvoiceOrderId(id);
-    sender.send(order, topic);
+    sender.send(order, "sipac.invoice.creditNote");
   }
   
   private OrderToInvoice buildMockOrder() {
     OrderToInvoice order = new OrderToInvoice();
     order.setApiKey("h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy");
+    order.setId("6FBD51B3-1014-40E6-988E-3C9E60575235");
     order.setCiaAcreedora(1);
+    order.setCp("08400");
     order.setCiaDeudora(2);
     order.setEstatus("1");
     order.setFechaEstatus(new Timestamp(new Date().getTime()));
