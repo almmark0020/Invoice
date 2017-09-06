@@ -105,6 +105,7 @@ public class InvoiceOrdersRepository {
         + " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
         + " ord.SINIESTRO_ACREEDOR as \"siniestroAcreedor\","
         + " sin.POLIZA as \"polizaDeudor\","
+        + " ord.FECHA_ESTATUS as \"fechaEstatus\","
         + " ord.POLIZA_ACREEDOR as \"polizaAcreedor\","
         + " ord.FOLIO_ORDEN as \"folio\","
         + " ord.ESTATUS_ID as \"estatus\" , ord.FECHA_ESTATUS as \"fechaEstatus\","
