@@ -1,6 +1,8 @@
 package mx.com.amis.sipac.invoice.persistence.domain;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -46,6 +48,12 @@ public class FacOrdenFacturada implements Serializable {
   @ManyToOne
   @JoinColumn(name="CIA_DEUDORA")
   private Compania compania2;
+  
+  @Column(name="FECHA_ESTATUS_SIPAC")
+  private Timestamp fechaEstatusSipac;
+  
+  @Column(name="ESTATUS_SIPAC")
+  private String estatusSipac;
 
   public FacOrdenFacturada() {
   }
@@ -144,6 +152,22 @@ public class FacOrdenFacturada implements Serializable {
 
   public void setCompania2(Compania compania2) {
     this.compania2 = compania2;
+  }
+
+  public Timestamp getFechaEstatusSipac() {
+    return fechaEstatusSipac;
+  }
+
+  public void setFechaEstatusSipac(Timestamp fechaEstatusSipac) {
+    this.fechaEstatusSipac = fechaEstatusSipac;
+  }
+
+  public String getEstatusSipac() {
+    return estatusSipac;
+  }
+
+  public void setEstatusSipac(String estatusSipac) {
+    this.estatusSipac = estatusSipac;
   }
 
 }

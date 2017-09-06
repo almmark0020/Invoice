@@ -36,7 +36,7 @@ public class JobsRegManageOrders {
       order.setInvoiceOrderId(id);
       sender.send(order, topic);
     }
-//    sendMock();
+    sendMock();
     logger.debug("End quartz process.");
   }
   
@@ -47,6 +47,8 @@ public class JobsRegManageOrders {
     order.setTipoOrden(orderToInv.getTipoOrden());
     order.setCompania1(new Compania(orderToInv.getCiaAcreedora()));
     order.setCompania2(new Compania(orderToInv.getCiaDeudora()));
+    order.setFechaEstatusSipac(orderToInv.getFechaEstatus());
+    order.setEstatusSipac(orderToInv.getEstatus());
     order = repository.registerInvoicedOrder(order);
     return order.getIdOrdenFacturada();
   }

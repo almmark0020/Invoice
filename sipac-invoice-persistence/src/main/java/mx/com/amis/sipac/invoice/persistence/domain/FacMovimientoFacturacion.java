@@ -25,6 +25,9 @@ public class FacMovimientoFacturacion implements Serializable {
 
   @Transient
   private byte[] pdf;
+  
+  @Column(name="CFDI_PDF")
+  private String cfdiPdf;
 
   @Column(name="FECHA_MOVIMIENTO")
   private Timestamp fechaMovimiento;
@@ -99,6 +102,14 @@ public class FacMovimientoFacturacion implements Serializable {
 
   public void setPdf(byte[] pdf) {
     this.pdf = pdf;
+  }
+
+  public String getCfdiPdf() {
+    return cfdiPdf;
+  }
+
+  public void setCfdiPdf(String cfdiPdf) {
+    this.cfdiPdf = cfdiPdf;
   }
 
 }

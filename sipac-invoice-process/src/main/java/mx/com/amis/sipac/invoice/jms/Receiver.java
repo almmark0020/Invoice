@@ -1,11 +1,14 @@
 package mx.com.amis.sipac.invoice.jms;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,9 @@ public class Receiver {
 
   @Value("${reachcore.recuperacion.url}")
   private String reachCoreRetrieveUrl;
+  
+  @Value("${local.vault.location}")
+  private String vaultPath;
 
   @Autowired private InvoiceOrdersRepository repository;
   @Autowired private MailService mailService;
@@ -325,16 +331,30 @@ public class Receiver {
     byte[] pdf = facade.getPdf(compr.getUUID()).getContents();
     logger.debug("pdf: " + pdf);
     mov.setPdf(pdf);
+    
+    String fileId = createVaultFiles(compr.getUUID(), resp.getResult().getBytes(), pdf);
+    mov.setCfdiXml(fileId + ".xml");
+    mov.setCfdiPdf(fileId + ".pdf");
 
     mov.setFacOrdenFacturada(new FacOrdenFacturada(order.getInvoiceOrderId()));
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
 
     mov.setUuid(compr.getUUID());
-    mov.setCfdiXml(resp.getResult());
     mov = repository.registerInvoiceMovement(mov);
     mov.setPdf(pdf);
     return mov;
+  }
+  
+  private String createVaultFiles(String uuid, byte[] xml, byte[] pdf) {
+    String fileId = vaultPath + File.separatorChar + uuid;
+    try {
+      FileUtils.writeByteArrayToFile(new File(fileId + ".xml"), xml);
+      FileUtils.writeByteArrayToFile(new File(fileId + ".pdf"), pdf);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return fileId;
   }
 
   private FacMovimientoError buildInvoiceError(String errorMsg, OrderToInvoice order, EstatusFacturacionEnum status) {
