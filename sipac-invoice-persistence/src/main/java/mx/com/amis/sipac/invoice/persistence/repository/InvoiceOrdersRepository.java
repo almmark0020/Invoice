@@ -88,7 +88,8 @@ public class InvoiceOrdersRepository {
         + " and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
         + " where fac.ID_ORDEN_FACTURADA = null"
         + " and ord.FECHA_ESTATUS >= CAST(convert(varchar, getdate(), 101) as DATE) "
-        + " and ord.ESTATUS_ID in (" + getStatusString(this.getAcceptedStatus()) + ")";
+        + " and ord.ESTATUS_ID in (" + getStatusString(this.getAcceptedStatus()) + ")"
+        + " and ord.ORIGEN != 'R' ";
     Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
     return q.getResultList();
   }
@@ -100,7 +101,7 @@ public class InvoiceOrdersRepository {
         + " (select UUID "
         + "     from FAC_MOVIMIENTO_FACTURACION "
         + "     where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and ID_ESTATUS_FACTURACION = 2) as id,"
+        + "     and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId() + ") as id,"
         + " sin.SINIESTRO_ID as \"siniestroId\","
         + " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
         + " ord.SINIESTRO_ACREEDOR as \"siniestroAcreedor\","
@@ -144,7 +145,7 @@ public class InvoiceOrdersRepository {
         + " (select UUID "
         + "     from FAC_MOVIMIENTO_FACTURACION "
         + "     where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and ID_ESTATUS_FACTURACION = 2) as id,"
+        + "     and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId() + ") as id,"
         + " sin.SINIESTRO_ID as \"siniestroId\","
         + " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
         + " ord.SINIESTRO_ACREEDOR as \"siniestroAcreedor\","
@@ -183,7 +184,7 @@ public class InvoiceOrdersRepository {
         + " (select UUID "
         + "     from FAC_MOVIMIENTO_FACTURACION "
         + "     where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and ID_ESTATUS_FACTURACION = 2) as id,"
+        + "     and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId() + ") as id,"
         + " sin.SINIESTRO_ID as \"siniestroId\","
         + " ord.FOLIO_ORDEN as \"folio\","
         + " ord.ESTATUS_ID as \"estatus\" , ord.FECHA_ESTATUS as \"fechaEstatus\","
@@ -209,7 +210,8 @@ public class InvoiceOrdersRepository {
         + " where fac.ID_ORDEN_FACTURADA != null"
         + " and mov.ID_MOVIMIENTO_FACTURACION = null"
         + " and ord.FECHA_ESTATUS >= CAST(convert(varchar, getdate(), 101) as DATE) "
-        + " and ord.ESTATUS_ID in (" + getStatusString(this.getRefundStatus()) + ")";
+        + " and ord.ESTATUS_ID in (" + getStatusString(this.getAcceptedStatus()) + ")"
+        + " and ord.ORIGEN = 'R' ";
     Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
     return q.getResultList();
   }
