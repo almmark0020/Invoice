@@ -157,6 +157,8 @@ public class InvoiceOrdersRepository {
         + " cia_deu.RAZON_SOCIAL as \"razonSocialDeudora\", cia_deu.REGIMEN_FISCAL as \"regimeFiscalDeudora\","
         + " ord.CIA_ACREEDORA as \"ciaAcreedora\", cia_acc.RFC as \"rfcAcreedora\","
         + " cia_acc.RAZON_SOCIAL as \"razonSocialAcreedora\", cia_acc.REGIMEN_FISCAL as \"regimeFiscalAcreedora\","
+        + " (select VALOR from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID "
+        + " and INICIO_VIGENCIA = (select MAX(INICIO_VIGENCIA) from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID)) as \"monto\","
         + " cia_acc.LUGAR_EXPEDICION_CP as \"cp\","
         + " '" + orderType + "' as \"tipoOrden\","
         + " api.APIKEY as \"apiKey\""
@@ -165,6 +167,8 @@ public class InvoiceOrdersRepository {
         + " join COMPANIAS cia_deu on sin.CIA_DEUDORA = cia_deu.CIA_ID"
         + " join COMPANIAS cia_acc on ord.CIA_ACREEDORA = cia_acc.CIA_ID"
         + " join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1"
+        + " join TIPO_VEHICULO tv on ord.TIPO_ID = tv.TIPO_ID"
+        + " join MARCAS mar on mar.MARCA_ID = tv.MARCA_ID"
         + " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
         + " and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
         + " left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
@@ -251,13 +255,6 @@ public class InvoiceOrdersRepository {
   private List<String> getCancelledStatus() {
     List<String> statusList = new ArrayList<String>();
     statusList.add(EstatusEnum.CANCELACION_ACEPTACION_PAGO.getEstatusId());
-    return statusList;
-  }
-  
-  // TODO get correct status
-  private List<String> getRefundStatus() {
-    List<String> statusList = new ArrayList<String>();
-    statusList.add(EstatusEnum.CONFIRMACIO0N_RECHAZO_POR_COMITE.getEstatusId());
     return statusList;
   }
   

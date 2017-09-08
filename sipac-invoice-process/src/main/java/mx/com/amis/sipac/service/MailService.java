@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-//import org.springframework.mail.javamail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,6 @@ public class MailService {
   private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
   @Autowired private JavaMailSender mailSender;
-  private SimpleMailMessage templateMessage;
 
   @Value("${send.from.email}")
   private String fromEmail;
@@ -39,7 +36,7 @@ public class MailService {
 
     StringBuffer sb = new StringBuffer();
     if (errorMsg == null) {
-      sb.append("<h3>Factura Generada</h3>");
+      //sb.append("<h3>Factura Generada</h3>");
     } else {
       sb.append("<h3>Error al generar la factura: " + errorMsg + " </h3>");
     }
@@ -79,18 +76,17 @@ public class MailService {
     return sb.toString();
   }
 
-  public String send(List<EmailToNotify> toEmail, String subject, String msgTxt) {
+  public String send(List<EmailToNotify> toEmail, String subject, String msgTxt) throws MessagingException {
     logger.debug("Starting Send...");
-    this.templateMessage = new SimpleMailMessage();
-    this.templateMessage.setSubject(subject);
-    this.templateMessage.setFrom(this.fromEmail);
-    this.templateMessage.setTo(getEmails(toEmail));
-
-    SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-    msg.setText(msgTxt);
-
+    MimeMessage message = mailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+    helper.setTo(getEmails(toEmail));
+    helper.setFrom(this.fromEmail);
+    helper.setSubject(subject);
+    helper.setText(msgTxt, true);
+    mailSender.send(message);
     try {
-      this.mailSender.send(msg);
+      this.mailSender.send(message);
     }
     catch(MailException ex){
       System.err.println(ex.getMessage());
