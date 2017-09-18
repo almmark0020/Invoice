@@ -82,7 +82,7 @@ public class Receiver {
         FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.FACTURA);
         //this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order));
         logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Emitida", mailService.builEmailBody(order), mov.getCfdiXml().getBytes(), mov.getPdf());
+        mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Emitida", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
         buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.FACTURA);
         mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order, resp.getError().toString()));
@@ -107,7 +107,7 @@ public class Receiver {
         FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.COMPLEMENTO);
         //this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order));
         logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Complemento de Pago Registrado", mailService.builEmailBody(order), mov.getCfdiXml().getBytes(), mov.getPdf());
+        mailService.sendMessageWithAttachment(emails, "SIPAC: Complemento de Pago Registrado", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
         buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.COMPLEMENTO);
         mailService.send(emails, "SIPAC: Error al registrar Complemento de Pago", mailService.builEmailBody(order, resp.getError().toString()));
@@ -131,7 +131,7 @@ public class Receiver {
       if (resp != null && resp.getError() == null) {
         FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.NOTA_CREDITO);
         logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Nota deCrédito Registrada", mailService.builEmailBody(order), mov.getCfdiXml().getBytes(), mov.getPdf());
+        mailService.sendMessageWithAttachment(emails, "SIPAC: Nota deCrédito Registrada", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
         buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.NOTA_CREDITO);
         mailService.send(emails, "SIPAC: Error al registrar Nota deCrédito", mailService.builEmailBody(order, resp.getError().toString()));
@@ -153,8 +153,8 @@ public class Receiver {
     try {
       resp = processCancelOrder(order);
       if (resp != null && !resp.isError()) {
-        buildCancelInvoiceMovement(order, EstatusFacturacionEnum.CANCELACION);
-        this.mailService.send(emails, "SIPAC: Factura cancelada", mailService.builEmailBody(order));
+        FacMovimientoFacturacion mov = buildCancelInvoiceMovement(order, EstatusFacturacionEnum.CANCELACION);
+        mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Cancelada", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
         buildInvoiceError(resp.getErrorMessage(), order, EstatusFacturacionEnum.CANCELACION);
         this.mailService.send(emails, "SIPAC: Factura cancelada", mailService.builEmailBody(order, resp.getErrorMessage()));
@@ -180,7 +180,8 @@ public class Receiver {
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
     mov.setUuid(order.getId());
-    mov.setCfdiXml("X");
+    mov.setPdf(this.retrievePdf(order.getApiKey(), order.getId()));
+    mov.setXml(this.retrieveXml(order.getApiKey(), order.getId()));
     mov = repository.registerInvoiceMovement(mov);
     return mov;
   }
@@ -325,12 +326,9 @@ public class Receiver {
     FacMovimientoFacturacion mov = new FacMovimientoFacturacion();
 
     Comprobante compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
-    ReachCoreFacade facade = new ReachCoreFacade(reachCoreRetrieveUrl, order.getApiKey());
-    logger.debug("before getting pdf..." + reachCoreRetrieveUrl);
-    logger.debug("UUID: " + compr.getUUID());
-    byte[] pdf = facade.getPdf(compr.getUUID()).getContents();
-    logger.debug("pdf: " + pdf);
+    byte[] pdf = retrievePdf(order.getApiKey(), compr.getUUID()); 
     mov.setPdf(pdf);
+    mov.setXml(resp.getResult().getBytes());
     
     String fileId = createVaultFiles(compr.getUUID(), resp.getResult().getBytes(), pdf);
     mov.setCfdiXml(fileId + ".xml");
@@ -344,6 +342,16 @@ public class Receiver {
     mov = repository.registerInvoiceMovement(mov);
     mov.setPdf(pdf);
     return mov;
+  }
+  
+  private byte[] retrievePdf(String apiKey, String uuid) throws Exception {
+    ReachCoreFacade facade = new ReachCoreFacade(reachCoreRetrieveUrl, apiKey);
+    return facade.getPdf(uuid).getContents();
+  }
+  
+  private byte[] retrieveXml(String apiKey, String uuid) throws Exception {
+    ReachCoreFacade facade = new ReachCoreFacade(reachCoreRetrieveUrl, apiKey);
+    return facade.getXml(uuid).getContents();
   }
   
   private String createVaultFiles(String uuid, byte[] xml, byte[] pdf) {

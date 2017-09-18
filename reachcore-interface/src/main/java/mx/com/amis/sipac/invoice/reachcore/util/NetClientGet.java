@@ -14,17 +14,30 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 
 public class NetClientGet {
+  public static final String PDF_FORMAT = "pdf";
+  public static final String XML_FORMAT = "xml";
+  public static final String PDF_CONTENT_TYPE = "application/pdf";
+  public static final String XML_CONTENT_TYPE = "application/xml";
+  
   public static FileResponse getPdf(String url, String apiKey, String uuid) throws Exception {
+    return getFile(url, apiKey, uuid, PDF_FORMAT);
+  }
+  
+  public static FileResponse getXml(String url, String apiKey, String uuid) throws Exception {
+    return getFile(url, apiKey, uuid, XML_FORMAT);
+  }
+  
+  public static FileResponse getFile(String url, String apiKey, String uuid, String format) throws Exception {
     FileResponse resp = new FileResponse();
     
     Client client = Client.create();
     WebResource webResource =client.resource(url);
     MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
     queryParams.add("uuid", uuid);
-    queryParams.add("format", "pdf");
+    queryParams.add("format", format);
 
     ClientResponse response = webResource.queryParams(queryParams)
-        .header("Content-Type", "application/pdf")
+        .header("Content-Type", format.equals(PDF_FORMAT) ? PDF_CONTENT_TYPE : XML_CONTENT_TYPE)
         .header("RCApiKey", apiKey)
         .get(ClientResponse.class);
     

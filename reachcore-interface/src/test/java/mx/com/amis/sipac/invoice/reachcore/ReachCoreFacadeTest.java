@@ -8,15 +8,16 @@ import org.junit.Test;
 
 import com.reachcore.services.api.ws.pacservices._6.EmitirComprobanteResponse;
 import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFiscalResponse;
+import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.TransactionDetailResponse;
 
 import mx.com.amis.sipac.invoice.reachcore.domain.FileResponse;
 import mx.com.amis.sipac.invoice.reachcore.facade.ReachCoreFacade;
 import mx.com.amis.sipac.invoice.reachcore.util.CfdiUtil;
-import mx.gob.sat.cfdi.serializer.v33.Comprobante.Complemento;
 import mx.gob.sat.cfdi.serializer.v33.CMoneda;
 import mx.gob.sat.cfdi.serializer.v33.CTipoDeComprobante;
 import mx.gob.sat.cfdi.serializer.v33.CUsoCFDI;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante;
+import mx.gob.sat.cfdi.serializer.v33.Comprobante.Complemento;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Conceptos.Concepto;
 import mx.gob.sat.cfdi.serializer.v33.Comprobante.Emisor;
@@ -24,35 +25,43 @@ import mx.gob.sat.cfdi.serializer.v33.Comprobante.Receptor;
 
 public class ReachCoreFacadeTest {
 
-//  @Test
+  //  @Test
   public void getPdf() throws Exception {
-    String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
+    //h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy
+    String apiKey = "okok";
     String url = "https://oat.reachcore.com/api/rest/Timbre/Get";
     ReachCoreFacade facade = new ReachCoreFacade(url, apiKey);
     FileResponse response = facade.getPdf("27A59B95-7288-4EDB-BEFC-B65458C742F2");
     FileUtils.writeByteArrayToFile(new File("/home/almmark0020/test/27A59B95-7288-4EDB-BEFC-B65458C742F2.pdf"), response.getContents());
     System.out.println("response: " + response);
   }
-  
-  @Test
+
+  //  @Test
   public void emit() throws Exception {
+    // h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String emitUrl = "https://oat.reachcore.com/api/ws/6.0/pacservices/Emision.svc/basic?wsdl";
     ReachCoreFacade facade = new ReachCoreFacade(emitUrl, apiKey);
     Comprobante compr = buildMockComprobante33();
     EmitirComprobanteResponse resp = facade.emitInvoice(compr);
     System.out.println("resp: " + resp);
-    
-    compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
-    for (Complemento compl : compr.getComplemento()) {
-      System.out.println("UUID: " + compl.getUUID());
-      for (Object any : compl.getAny()) {
-        System.out.println("compl: " + any.toString());
+
+    if(ReachCoreFacade.hasErrors(resp)) {
+      System.out.println("error code: " + ReachCoreFacade.getErrorCode(resp));
+      System.out.println("error message: " + ReachCoreFacade.getErrorMessage(resp));
+    } else {
+
+      compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
+      for (Complemento compl : compr.getComplemento()) {
+        System.out.println("UUID: " + compl.getUUID());
+        for (Object any : compl.getAny()) {
+          System.out.println("compl: " + any.toString());
+        }
       }
     }
   }
 
-//  @Test
+  @Test
   public void cancel() throws Exception {
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String cancelUrl = "https://oat.reachcore.com/api/ws/timbre-fiscal/Cancelacion.svc/basic?wsdl";
@@ -60,8 +69,17 @@ public class ReachCoreFacadeTest {
     facade.setUrl(cancelUrl);
     CancelacionFiscalResponse respCan = facade.cancelInvoice("LOVM840920AA9", "F9123206-D86C-49EE-80F3-C288CC948631");
     System.out.println("respCancelacion: " + respCan);
+    if (ReachCoreFacade.hasErrors(respCan)) {
+      System.out.println("error code: " + ReachCoreFacade.getErrorCode(respCan));
+      System.out.println("error message: " + ReachCoreFacade.getErrorMessage(respCan));
+    }
+    if (respCan.getFolios() != null && respCan.getFolios().getTransactionDetailResponse() != null) {
+      for (TransactionDetailResponse tr : respCan.getFolios().getTransactionDetailResponse()) {
+        System.out.println("transaction: " + tr);
+      }
+    }
   }
-  
+
   private Comprobante buildMockComprobante33() {
     Comprobante compr =  new Comprobante();
     compr.setVersion("3.3");
@@ -77,28 +95,28 @@ public class ReachCoreFacadeTest {
     emisor.setRfc("AAA010101AAA");
     emisor.setNombre("ACCEM SERVICIOS EMPRESARIALES SC");
     emisor.setRegimenFiscal("601");
-//    RegimenFiscal regimen = new RegimenFiscal();
-//    regimen.setRegimen("Regimen Actividad Empresarial");
+    //    RegimenFiscal regimen = new RegimenFiscal();
+    //    regimen.setRegimen("Regimen Actividad Empresarial");
     //emisor.getRegimenFiscal().add(regimen);
-//    TUbicacionFiscal domicilio = new TUbicacionFiscal();
-//    domicilio.setCalle("Calle Emisor Trial");
-//    domicilio.setMunicipio("Deleg/Mpio Emisor Trial");
-//    domicilio.setEstado("Distrito Federal Emisor Trial");
-//    domicilio.setPais("Mexico Emisor Trial");
-//    domicilio.setCodigoPostal("09876");
-//    emisor.setDomicilioFiscal(domicilio);
+    //    TUbicacionFiscal domicilio = new TUbicacionFiscal();
+    //    domicilio.setCalle("Calle Emisor Trial");
+    //    domicilio.setMunicipio("Deleg/Mpio Emisor Trial");
+    //    domicilio.setEstado("Distrito Federal Emisor Trial");
+    //    domicilio.setPais("Mexico Emisor Trial");
+    //    domicilio.setCodigoPostal("09876");
+    //    emisor.setDomicilioFiscal(domicilio);
     compr.setEmisor(emisor);
 
     Receptor receptor = new Receptor();
     receptor.setRfc("LOVM840920DI9");
     receptor.setNombre("MARCO ANTONIO LOPEZ VARGAS");
-//    TUbicacion dom = new TUbicacion();
-//    dom.setCalle("Calle Emisor Trial");
-//    dom.setMunicipio("Deleg/Mpio Emisor Trial");
-//    dom.setEstado("Distrito Federal Emisor Trial");
-//    dom.setPais("Mexico Emisor Trial");
-//    dom.setCodigoPostal("09876");
-//    receptor.setDomicilio(dom);
+    //    TUbicacion dom = new TUbicacion();
+    //    dom.setCalle("Calle Emisor Trial");
+    //    dom.setMunicipio("Deleg/Mpio Emisor Trial");
+    //    dom.setEstado("Distrito Federal Emisor Trial");
+    //    dom.setPais("Mexico Emisor Trial");
+    //    dom.setCodigoPostal("09876");
+    //    receptor.setDomicilio(dom);
     receptor.setUsoCFDI(CUsoCFDI.D_01);
     compr.setReceptor(receptor);
 
@@ -110,17 +128,17 @@ public class ReachCoreFacadeTest {
     concepto.setImporte(new BigDecimal(0));
     concepto.setClaveProdServ("01010101");
     concepto.setClaveUnidad("H87");
-    
+
     Conceptos conceptos = new Conceptos();
     conceptos.getConcepto().add(concepto);
     compr.setConceptos(conceptos);
 
-//    Impuestos impuestos = new Impuestos();
-//    compr.setImpuestos(impuestos);
+    //    Impuestos impuestos = new Impuestos();
+    //    compr.setImpuestos(impuestos);
 
     return compr;
   }
-  
+
   /*
   private mx.gob.sat.cfdi.serializer.v32.Comprobante buildMockComprobante32() {
     Comprobante compr =  new Comprobante();
@@ -176,5 +194,5 @@ public class ReachCoreFacadeTest {
 
     return compr;
   }
-  */
+   */
 }
