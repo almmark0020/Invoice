@@ -21,6 +21,9 @@ public class FacMovimientoError implements Serializable {
   @Column(name="ID_MOVIMIENTO_ERROR")
   private Long idMovimientoError;
 
+  @Column(name="CODIGO_ERROR")
+  private String codigoError;
+  
   @Column(name="MENSAJE_ERROR")
   private String mensajeError;
 
@@ -42,6 +45,14 @@ public class FacMovimientoError implements Serializable {
 
   public Long getIdMovimientoError() {
     return this.idMovimientoError;
+  }
+
+  public String getCodigoError() {
+    return codigoError;
+  }
+
+  public void setCodigoError(String codigoError) {
+    this.codigoError = codigoError;
   }
 
   public void setIdMovimientoError(Long idMovimientoError) {

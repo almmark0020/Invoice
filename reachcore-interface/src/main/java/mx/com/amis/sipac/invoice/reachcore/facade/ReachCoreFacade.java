@@ -129,6 +129,72 @@ public class ReachCoreFacade {
   public FileResponse getPdf(String uuid) throws Exception {
     return NetClientGet.getPdf(url, apiKey, uuid);
   }
+  
+  /**
+   * Retrieves a xml file from reachcore's vault
+   * @param uuid The invoice id to be requested
+   * @return 
+   * @throws Exception
+   */
+  public FileResponse getXml(String uuid) throws Exception {
+    return NetClientGet.getXml(url, apiKey, uuid);
+  }
+  
+  public static boolean hasErrors(EmitirComprobanteResponse resp) {
+    return resp.getError() != null;
+  }
+  
+  public static boolean hasErrors(CancelacionFiscalResponse resp) {
+    return resp.isError();
+  }
+  
+  public static String getErrorCode(EmitirComprobanteResponse resp) {
+    if (resp == null || resp.getError() == null) {
+      return null;
+    }
+    if (resp.getError().getInnerErrors() == null 
+        || resp.getError().getInnerErrors().getError() == null 
+        || resp.getError().getInnerErrors().getError().isEmpty()) {
+      return resp.getError().getCode();
+    }
+    return resp.getError().getInnerErrors().getError().get(0).getCode();
+  }
+  
+  public static String getErrorMessage(EmitirComprobanteResponse resp) {
+    if (resp == null || resp.getError() == null) {
+      return null;
+    }
+    if (resp.getError().getInnerErrors() == null 
+        || resp.getError().getInnerErrors().getError() == null 
+        || resp.getError().getInnerErrors().getError().isEmpty()) {
+      return resp.getError().getMessage();
+    }
+    return resp.getError().getInnerErrors().getError().get(0).getMessage();
+  }
+  
+  public static String getErrorCode(CancelacionFiscalResponse resp) {
+    if (resp == null || resp.getErrorMessage() == null) {
+      return null;
+    }
+    if (resp.getFolios() == null 
+        || resp.getFolios().getTransactionDetailResponse() == null 
+        || resp.getFolios().getTransactionDetailResponse().isEmpty()){
+      return resp.getErrorMessage();
+    }
+    return resp.getFolios().getTransactionDetailResponse().get(0).getResultCode();
+  }
+  
+  public static String getErrorMessage(CancelacionFiscalResponse resp) {
+    if (resp == null || resp.getErrorMessage() == null) {
+      return null;
+    }
+    if (resp.getFolios() == null 
+        || resp.getFolios().getTransactionDetailResponse() == null 
+        || resp.getFolios().getTransactionDetailResponse().isEmpty()){
+      return resp.getErrorMessage();
+    }
+    return resp.getFolios().getTransactionDetailResponse().get(0).getResultMessage();
+  }
 
   public String getUrl() {
     return url;
