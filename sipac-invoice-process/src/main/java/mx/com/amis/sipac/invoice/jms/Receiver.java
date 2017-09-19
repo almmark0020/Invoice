@@ -116,7 +116,7 @@ public class Receiver {
       resp = process(order, status);
       if (resp != null && !ReachCoreFacade.hasErrors(resp)) {
         FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, status);
-        logger.debug("before send email...");
+        logger.debug("before send email..." + mov.getXml());
         mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Emitida", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
         buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, status);
@@ -158,9 +158,9 @@ public class Receiver {
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
     mov.setUuid(order.getId());
+    mov = repository.registerInvoiceMovement(mov);
     mov.setPdf(this.retrievePdf(order.getApiKey(), order.getId()));
     mov.setXml(this.retrieveXml(order.getApiKey(), order.getId()));
-    mov = repository.registerInvoiceMovement(mov);
     return mov;
   }
 
@@ -292,9 +292,8 @@ public class Receiver {
     FacMovimientoFacturacion mov = new FacMovimientoFacturacion();
 
     Comprobante compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
-    byte[] pdf = retrievePdf(order.getApiKey(), compr.getUUID()); 
-    mov.setPdf(pdf);
-    mov.setXml(resp.getResult().getBytes());
+    byte[] pdf = retrievePdf(order.getApiKey(), compr.getUUID());
+    //byte[] xml = retrieveXml(order.getApiKey(), compr.getUUID());
 
     String fileId = createVaultFiles(compr.getUUID(), resp.getResult().getBytes(), pdf);
     mov.setCfdiXml(fileId + ".xml");
@@ -306,7 +305,9 @@ public class Receiver {
 
     mov.setUuid(compr.getUUID());
     mov = repository.registerInvoiceMovement(mov);
+    
     mov.setPdf(pdf);
+    mov.setXml(resp.getResult().getBytes());
     return mov;
   }
 

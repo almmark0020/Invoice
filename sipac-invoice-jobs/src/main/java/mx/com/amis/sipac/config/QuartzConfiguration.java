@@ -26,7 +26,7 @@ public class QuartzConfiguration {
     stFactory.setStartDelay(3000);
     stFactory.setName("mytrigger");
     stFactory.setGroup("mygroup");
-    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
     return stFactory;
   }
   
@@ -53,7 +53,7 @@ public class QuartzConfiguration {
     stFactory.setStartDelay(3000);
     stFactory.setName("mytrigger2");
     stFactory.setGroup("mygroup2");
-    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
     return stFactory;
   }
 
@@ -80,7 +80,7 @@ public class QuartzConfiguration {
     stFactory.setStartDelay(3000);
     stFactory.setName("mytrigger3");
     stFactory.setGroup("mygroup3");
-    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
     return stFactory;
   }
 
@@ -107,7 +107,7 @@ public class QuartzConfiguration {
     stFactory.setStartDelay(3000);
     stFactory.setName("mytrigger4");
     stFactory.setGroup("mygroup4");
-    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
     return stFactory;
   }
 
