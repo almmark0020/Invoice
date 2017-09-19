@@ -63,7 +63,7 @@ public class Receiver {
 
   @Value("${reachcore.recuperacion.url}")
   private String reachCoreRetrieveUrl;
-  
+
   @Value("${local.vault.location}")
   private String vaultPath;
 
@@ -72,76 +72,17 @@ public class Receiver {
 
   @KafkaListener(topics = "${kafka.topic.invoice}")
   public void receive(String message) {
-    logger.info("received message='{}'", message);
-    EmitirComprobanteResponse resp = null;
-    OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
-    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
-    try {
-      resp = processOrder(order);
-      if (resp != null && resp.getError() == null) {
-        FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.FACTURA);
-        //this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order));
-        logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Emitida", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
-      } else {
-        buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.FACTURA);
-        mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order, resp.getError().toString()));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      buildInvoiceError(e.getMessage(), order, EstatusFacturacionEnum.FACTURA);
-      // sendErrorEmail
-    }
-    latch.countDown();
+    processMessage(message, EstatusFacturacionEnum.FACTURA);
   }
 
   @KafkaListener(topics = "${kafka.topic.invoice.complement}")
   public void receiveComplement(String message) {
-    logger.info("received message complemento='{}'", message);
-    EmitirComprobanteResponse resp = null;
-    OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
-    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
-    try {
-      resp = processComplementOrder(order);
-      if (resp != null && resp.getError() == null) {
-        FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.COMPLEMENTO);
-        //this.mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order));
-        logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Complemento de Pago Registrado", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
-      } else {
-        buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.COMPLEMENTO);
-        mailService.send(emails, "SIPAC: Error al registrar Complemento de Pago", mailService.builEmailBody(order, resp.getError().toString()));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      buildInvoiceError(e.getMessage(), order, EstatusFacturacionEnum.COMPLEMENTO);
-      // sendErrorEmail
-    }
-    latch.countDown();
+    processMessage(message, EstatusFacturacionEnum.COMPLEMENTO);
   }
-  
+
   @KafkaListener(topics = "${kafka.topic.invoice.creditNote}")
   public void receiveCreditNote(String message) {
-    logger.info("received message complemento='{}'", message);
-    EmitirComprobanteResponse resp = null;
-    OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
-    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
-    try {
-      resp = processCreditNoteOrder(order);
-      if (resp != null && resp.getError() == null) {
-        FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, EstatusFacturacionEnum.NOTA_CREDITO);
-        logger.debug("before send email...");
-        mailService.sendMessageWithAttachment(emails, "SIPAC: Nota deCrédito Registrada", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
-      } else {
-        buildInvoiceError(resp.getError().toString(), order, EstatusFacturacionEnum.NOTA_CREDITO);
-        mailService.send(emails, "SIPAC: Error al registrar Nota deCrédito", mailService.builEmailBody(order, resp.getError().toString()));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      buildInvoiceError(e.getMessage(), order, EstatusFacturacionEnum.NOTA_CREDITO);
-      // sendErrorEmail
-    }
-    latch.countDown();
+    processMessage(message, EstatusFacturacionEnum.NOTA_CREDITO);
   }
 
   @KafkaListener(topics = "${kafka.topic.invoice.cancel}")
@@ -156,15 +97,52 @@ public class Receiver {
         FacMovimientoFacturacion mov = buildCancelInvoiceMovement(order, EstatusFacturacionEnum.CANCELACION);
         mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Cancelada", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
       } else {
-        buildInvoiceError(resp.getErrorMessage(), order, EstatusFacturacionEnum.CANCELACION);
+        buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, EstatusFacturacionEnum.CANCELACION);
         this.mailService.send(emails, "SIPAC: Factura cancelada", mailService.builEmailBody(order, resp.getErrorMessage()));
       }
     } catch (Exception e) {
       e.printStackTrace();
-      buildInvoiceError(e.getMessage(), order, EstatusFacturacionEnum.CANCELACION);
+      buildInvoiceError("0", e.getMessage(), order, EstatusFacturacionEnum.CANCELACION);
+    }
+    latch.countDown();
+  }
+
+  private void processMessage(String message, EstatusFacturacionEnum status) {
+    logger.info("received message='{}'", message);
+    EmitirComprobanteResponse resp = null;
+    OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
+    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
+    try {
+      resp = process(order, status);
+      if (resp != null && !ReachCoreFacade.hasErrors(resp)) {
+        FacMovimientoFacturacion mov = buildInvoiceMovement(order, resp, status);
+        logger.debug("before send email...");
+        mailService.sendMessageWithAttachment(emails, "SIPAC: Factura Emitida", mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
+      } else {
+        buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, status);
+        mailService.send(emails, "SIPAC: Factura emitida", mailService.builEmailBody(order, resp.getError().toString()));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      buildInvoiceError("0", e.getMessage(), order, status);
       // sendErrorEmail
     }
     latch.countDown();
+  }
+
+  private EmitirComprobanteResponse process(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {
+    switch(status){
+    case FACTURA:
+      return processOrder(order);
+    case COMPLEMENTO:
+      return processComplementOrder(order);
+    case NOTA_CREDITO:
+      return processCreditNoteOrder(order);
+    case EN_PROCESO:
+    case CANCELACION:
+      return null;
+    }
+    return null;
   }
 
   private CancelacionFiscalResponse processCancelOrder(OrderToInvoice order) throws Exception {
@@ -187,33 +165,21 @@ public class Receiver {
   }
 
   private EmitirComprobanteResponse processOrder(OrderToInvoice order) throws Exception {
-    //String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     ReachCoreFacade facade = new ReachCoreFacade(reachCoreEmitUrl, order.getApiKey());
     Comprobante compr = buildComprobante(order);
-    EmitirComprobanteResponse resp;
-    resp = facade.emitInvoice(compr);
-    System.out.println("resp: " + resp);
-    return resp;
+    return facade.emitInvoice(compr);
   }
 
   private EmitirComprobanteResponse processComplementOrder(OrderToInvoice order) throws Exception {
-    //String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     ReachCoreFacade facade = new ReachCoreFacade(reachCoreEmitUrl, order.getApiKey());
     Comprobante compr = this.buildPaymentComplement(order);
-    EmitirComprobanteResponse resp;
-    resp = facade.emitInvoice(compr);
-    System.out.println("resp: " + resp);
-    return resp;
+    return facade.emitInvoice(compr);
   }
-  
+
   private EmitirComprobanteResponse processCreditNoteOrder(OrderToInvoice order) throws Exception {
-    //String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     ReachCoreFacade facade = new ReachCoreFacade(reachCoreEmitUrl, order.getApiKey());
     Comprobante compr = this.buildCreditNote(order);
-    EmitirComprobanteResponse resp;
-    resp = facade.emitInvoice(compr);
-    System.out.println("resp: " + resp);
-    return resp;
+    return facade.emitInvoice(compr);
   }
 
   private Comprobante buildComprobante(OrderToInvoice order) {
@@ -306,7 +272,7 @@ public class Receiver {
 
     return compr;
   }
-  
+
   private Comprobante buildCreditNote(OrderToInvoice order) {
     Comprobante compr = buildComprobante(order);
     compr.setTipoDeComprobante(CTipoDeComprobante.E);
@@ -329,7 +295,7 @@ public class Receiver {
     byte[] pdf = retrievePdf(order.getApiKey(), compr.getUUID()); 
     mov.setPdf(pdf);
     mov.setXml(resp.getResult().getBytes());
-    
+
     String fileId = createVaultFiles(compr.getUUID(), resp.getResult().getBytes(), pdf);
     mov.setCfdiXml(fileId + ".xml");
     mov.setCfdiPdf(fileId + ".pdf");
@@ -343,17 +309,17 @@ public class Receiver {
     mov.setPdf(pdf);
     return mov;
   }
-  
+
   private byte[] retrievePdf(String apiKey, String uuid) throws Exception {
     ReachCoreFacade facade = new ReachCoreFacade(reachCoreRetrieveUrl, apiKey);
     return facade.getPdf(uuid).getContents();
   }
-  
+
   private byte[] retrieveXml(String apiKey, String uuid) throws Exception {
     ReachCoreFacade facade = new ReachCoreFacade(reachCoreRetrieveUrl, apiKey);
     return facade.getXml(uuid).getContents();
   }
-  
+
   private String createVaultFiles(String uuid, byte[] xml, byte[] pdf) {
     String fileId = vaultPath + File.separatorChar + uuid;
     try {
@@ -365,11 +331,12 @@ public class Receiver {
     return fileId;
   }
 
-  private FacMovimientoError buildInvoiceError(String errorMsg, OrderToInvoice order, EstatusFacturacionEnum status) {
+  private FacMovimientoError buildInvoiceError(String errorCode, String errorMsg, OrderToInvoice order, EstatusFacturacionEnum status) {
     FacMovimientoError mov = new FacMovimientoError();
     mov.setFacOrdenFacturada(new FacOrdenFacturada(order.getInvoiceOrderId()));
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
+    mov.setCodigoError(errorCode);
     mov.setMensajeError(errorMsg);
     mov = repository.registerInvoiceMovement(mov);
     return mov;
