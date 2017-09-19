@@ -105,9 +105,11 @@ public class MailService {
     helper.setFrom(this.fromEmail);
     helper.setSubject(subject);
     helper.setText(text, true);
+    
+    logger.debug("xml to attach: " + xml);
 
-    helper.addAttachment("XML.xml", new ByteArrayResource(xml));
     helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
+    helper.addAttachment("XML.xml", new ByteArrayResource(xml));
 
     mailSender.send(message);
   }

@@ -87,7 +87,7 @@ public class InvoiceOrdersRepository {
         + " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
         + "     and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
         + " left join FAC_MOVIMIENTO_FACTURACION mov "
-        + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
+        + "     on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
         + "     and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId()
         + " left join FAC_MOVIMIENTO_ERROR err "
         + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
