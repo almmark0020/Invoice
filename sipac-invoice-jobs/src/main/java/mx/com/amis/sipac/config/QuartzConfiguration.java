@@ -118,4 +118,31 @@ public class QuartzConfiguration {
     scheduler.setTriggers(cronTriggerCreditNoteFactoryBean().getObject());
     return scheduler;
   }
+  
+  @Bean
+  public MethodInvokingJobDetailFactoryBean methodInvokingRetryErrorsJob() {
+    MethodInvokingJobDetailFactoryBean obj = new MethodInvokingJobDetailFactoryBean();
+    obj.setTargetBeanName("retryErrorsJob");
+    obj.setTargetMethod("process");
+    return obj;
+  }
+  
+  @Bean
+  public CronTriggerFactoryBean cronTriggerRetryErrorsFactoryBean(){
+    CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
+    stFactory.setJobDetail(methodInvokingRetryErrorsJob().getObject());
+    stFactory.setStartDelay(3000);
+    stFactory.setName("mytrigger5");
+    stFactory.setGroup("mygroup5");
+    stFactory.setCronExpression("0 0 0/8 * * ?"); // every eight hours
+    return stFactory;
+  }
+
+  @Bean
+  public SchedulerFactoryBean schedulerRetryErrorsFactoryBean() {
+    SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
+    System.out.println("Iniciando el llamado ......");
+    scheduler.setTriggers(cronTriggerRetryErrorsFactoryBean().getObject());
+    return scheduler;
+  }
 }

@@ -29,6 +29,9 @@ public class FacMovimientoError implements Serializable {
 
   @Column(name="FECHA_MOVIMIENTO")
   private Timestamp fechaMovimiento;
+  
+  @Column(name="REINTENTO")
+  private Boolean reintento;
 
   //bi-directional many-to-one association to FacEstatusFacturacion
   @ManyToOne
@@ -89,6 +92,14 @@ public class FacMovimientoError implements Serializable {
 
   public void setFechaMovimiento(Timestamp fechaMovimiento) {
     this.fechaMovimiento = fechaMovimiento;
+  }
+
+  public Boolean getReintento() {
+    return reintento;
+  }
+
+  public void setReintento(Boolean reintento) {
+    this.reintento = reintento;
   }
 
 }
