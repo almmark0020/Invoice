@@ -143,7 +143,7 @@ public class InvoiceOrdersRepository {
         + " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
         + "     and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
         + " left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.COMPLEMENTO.getEstatusId()
+        + "     and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.COMPLEMENTO.getEstatusId()
         + " left join FAC_MOVIMIENTO_ERROR err "
         + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
         + "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.COMPLEMENTO.getEstatusId()
@@ -192,7 +192,7 @@ public class InvoiceOrdersRepository {
         + " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
         + "     and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
         + " left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.CANCELACION.getEstatusId()
+        + "     and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.CANCELACION.getEstatusId()
         + " left join FAC_MOVIMIENTO_ERROR err "
         + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
         + "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.CANCELACION.getEstatusId()
@@ -243,7 +243,7 @@ public class InvoiceOrdersRepository {
         "         left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID " + 
         "         and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = 'D' and fac.CIA_DEUDORA = sin.CIA_DEUDORA  " + 
         "         left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA" +
-        "  and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId()  
+        "  and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId()  
         + " left join FAC_MOVIMIENTO_ERROR err "
         + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
         + "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() 
