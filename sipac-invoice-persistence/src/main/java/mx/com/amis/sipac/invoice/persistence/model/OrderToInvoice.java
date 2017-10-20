@@ -34,6 +34,7 @@ public class OrderToInvoice implements Serializable {
   private String regimeFiscalAcreedora;
   private String cp;
   private String apiKey;
+  private String siniestroCorrecto;
   
   public String getId() {
     return id;
@@ -166,5 +167,11 @@ public class OrderToInvoice implements Serializable {
   }
   public void setApiKey(String apiKey) {
     this.apiKey = apiKey;
+  }
+  public String getSiniestroCorrecto() {
+	  return siniestroCorrecto;
+  }
+  public void setSiniestroCorrecto(String siniestroCorrecto) {
+	  this.siniestroCorrecto = siniestroCorrecto;
   }
 }

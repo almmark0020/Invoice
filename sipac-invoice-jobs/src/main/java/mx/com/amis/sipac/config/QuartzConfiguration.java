@@ -119,6 +119,39 @@ public class QuartzConfiguration {
     return scheduler;
   }
   
+  //
+  
+  @Bean
+  public MethodInvokingJobDetailFactoryBean methodInvokingAutAcceptanceInvoicesJob() {
+    MethodInvokingJobDetailFactoryBean obj = new MethodInvokingJobDetailFactoryBean();
+    obj.setTargetBeanName("autAcceptanceJob");
+    obj.setTargetMethod("process");
+    return obj;
+  }
+  
+  @Bean
+  public CronTriggerFactoryBean cronTriggerAutAcceptanceFactoryBean(){
+    CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
+    stFactory.setJobDetail(methodInvokingAutAcceptanceInvoicesJob().getObject());
+    stFactory.setStartDelay(3000);
+    stFactory.setName("mytrigger6");
+    stFactory.setGroup("mygroup6");
+//    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+//    stFactory.setCronExpression("0 */12 * * * ?"); // every twelve hours
+    stFactory.setCronExpression("0 1 7 * * ?"); // every day at 7:00 am
+    return stFactory;
+  }
+
+  @Bean
+  public SchedulerFactoryBean schedulerAutAcceptanceFactoryBean() {
+    SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
+    System.out.println("Iniciando el llamado ......");
+    scheduler.setTriggers(cronTriggerAutAcceptanceFactoryBean().getObject());
+    return scheduler;
+  }
+  
+  //
+  
   @Bean
   public MethodInvokingJobDetailFactoryBean methodInvokingRetryErrorsJob() {
     MethodInvokingJobDetailFactoryBean obj = new MethodInvokingJobDetailFactoryBean();

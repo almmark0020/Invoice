@@ -36,7 +36,7 @@ public class ReachCoreFacadeTest {
     System.out.println("response: " + response);
   }
 
-  //  @Test
+    @Test
   public void emit() throws Exception {
     // h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
@@ -60,8 +60,42 @@ public class ReachCoreFacadeTest {
       }
     }
   }
+  
+//  @Test
+  public void emitString() throws Exception {
+	    String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
+	    String emitUrl = "https://oat.reachcore.com/api/ws/6.0/pacservices/Emision.svc/basic?wsdl";
+	    ReachCoreFacade facade = new ReachCoreFacade(emitUrl, apiKey);
+	    String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> " + 
+	    		"<cfdi:ns2:Comprobante Version=\"3.3\" Fecha=\"2017-10-13T00:00:59\" SubTotal=\"15658\" Moneda=\"MXN\" Total=\"15658\" TipoDeComprobante=\"I\" LugarExpedicion=\"66260\" xmlns:cfdi=\"http://www.sat.gob.mx/TimbreFiscalDigital\" xmlns:ns2=\"http://www.sat.gob.mx/cfd/3\"> " + 
+	    		"    <cfdi:ns2:Emisor Rfc=\"AAA010101AAA\" Nombre=\"ABA SEGUROS, S.A. DE C.V.\" RegimenFiscal=\"601\"/> " + 
+	    		"    <cfdi:ns2:Receptor Rfc=\"SMS401001573\" Nombre=\"SEGUROS VE POR MAS, S.A. GRUPO FINANCIERO VE POR MAS\" UsoCFDI=\"P01\"/> " + 
+	    		"    <cfdi:ns2:Conceptos> " + 
+	    		"        <cfdi:ns2:Concepto ClaveProdServ=\"01010101\" Cantidad=\"1\" ClaveUnidad=\"E48\" Unidad=\"Unidad de Servicio\" Descripcion=\"Percepcion de la indemnizacion de la recuperacion asociada a Siniestro Afectado S13A. Folio F1210-2. Siniestro Responsable S1210-2. Poliza Responsable P12. Poliza Acreedor P76. Siniestro Acreedor S13A. Siniestro correcto \" ValorUnitario=\"15658\" Importe=\"15658\"/> " + 
+	    		"    </cfdi:ns2:Conceptos> " + 
+	    		"</cfdi:ns2:Comprobante> ";
+	    System.out.println("xmlString: " + xmlString);
+	    EmitirComprobanteResponse resp = facade.emitInvoice(xmlString);
+	    System.out.println("resp: " + resp);
 
-  @Test
+	    if(ReachCoreFacade.hasErrors(resp)) {
+	      System.out.println("error code: " + ReachCoreFacade.getErrorCode(resp));
+	      System.out.println("error message: " + ReachCoreFacade.getErrorMessage(resp));
+	    } else {
+
+	      Comprobante compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
+	      for (Complemento compl : compr.getComplemento()) {
+	        System.out.println("UUID: " + compl.getUUID());
+	        for (Object any : compl.getAny()) {
+	          System.out.println("compl: " + any.toString());
+	        }
+	      }
+	    }
+	  }
+
+  
+   
+//  @Test
   public void cancel() throws Exception {
     String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
     String cancelUrl = "https://oat.reachcore.com/api/ws/timbre-fiscal/Cancelacion.svc/basic?wsdl";

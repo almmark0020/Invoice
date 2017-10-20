@@ -66,9 +66,17 @@ public class ReachCoreFacade {
     EmitirComprobanteRequest req = new EmitirComprobanteRequest();
     String cfdiString = CfdiUtil.formatCfdiToString(compr);
     logger.debug("xml: " + cfdiString);
-    System.out.println("xml: " + cfdiString);
     req.setComprobante(cfdiString);
     return cliente.emitirComprobante(req, apiKey);
+  }
+  
+  public EmitirComprobanteResponse emitInvoice(String cfdiString) throws Exception {
+	  Emision emision = new Emision(new URL(url));
+	  IEmision cliente = emision.getBasicHttpBindingIEmision();
+	  EmitirComprobanteRequest req = new EmitirComprobanteRequest();
+	  logger.debug("xml: " + cfdiString);
+	  req.setComprobante(cfdiString);
+	  return cliente.emitirComprobante(req, apiKey);
   }
 
   /**

@@ -51,4 +51,9 @@ public class ReceiverConfiguration {
   public Receiver receiver() {
     return new Receiver();
   }
+  
+  @Bean
+  public AutomaticAcceptanceReceiver automaticAcceptanceReceiver() {
+	  return new AutomaticAcceptanceReceiver();
+  }
 }

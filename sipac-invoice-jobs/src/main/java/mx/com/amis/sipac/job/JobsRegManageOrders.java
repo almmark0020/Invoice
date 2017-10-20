@@ -32,8 +32,8 @@ public class JobsRegManageOrders {
 		logger.debug("Start quartz process...");
 		List<OrderToInvoice> orders = repository.getAcceptedOrdersToInvoice();
 		for(OrderToInvoice order : orders) {
-			Long id = registerInvoiceOrder(order);
-			order.setInvoiceOrderId(id);
+			//Long id = registerInvoiceOrder(order);
+			//order.setInvoiceOrderId(id);
 			sender.send(order, topic);
 		}
 		//    sendMock();
@@ -52,7 +52,7 @@ public class JobsRegManageOrders {
 		order = repository.registerInvoicedOrder(order);
 		return order.getIdOrdenFacturada();
 	}
-
+	
 	@SuppressWarnings("unused")
 	private void sendMock() {
 		OrderToInvoice order = buildMockOrder();
