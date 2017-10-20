@@ -45,7 +45,7 @@ public class CancelReceiver {
     logger.info("received message='{}'", message);
     CancelacionFiscalResponse resp = null;
     OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
-    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora());
+    List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
     try {
       resp = processOrder(order);
       if (resp != null && !resp.isError()) {

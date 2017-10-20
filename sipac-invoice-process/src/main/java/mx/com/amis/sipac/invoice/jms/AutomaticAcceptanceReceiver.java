@@ -48,8 +48,8 @@ import mx.gob.sat.cfdi.serializer.v33.Pagos;
 import mx.gob.sat.cfdi.serializer.v33.Pagos.Pago;
 import mx.gob.sat.cfdi.serializer.v33.Pagos.Pago.DoctoRelacionado;
 
-public class Receiver {
-	private static final Logger logger = LoggerFactory.getLogger(Receiver.class);
+public class AutomaticAcceptanceReceiver {
+	private static final Logger logger = LoggerFactory.getLogger(AutomaticAcceptanceReceiver.class);
 
 	private CountDownLatch latch = new CountDownLatch(1);
 
@@ -78,46 +78,9 @@ public class Receiver {
 	@Autowired private InvoiceOrdersRepository repository;
 	@Autowired private MailService mailService;
 
-	@KafkaListener(topics = "${kafka.topic.invoice}")
+	@KafkaListener(topics = "${kafka.topic.invoice.automaticAcceptance}")
 	public void receive(String message) {
 		processMessage(message, EstatusFacturacionEnum.FACTURA);
-	}
-
-	@KafkaListener(topics = "${kafka.topic.invoice.complement}")
-	public void receiveComplement(String message) {
-		processMessage(message, EstatusFacturacionEnum.COMPLEMENTO);
-	}
-
-	@KafkaListener(topics = "${kafka.topic.invoice.creditNote}")
-	public void receiveCreditNote(String message) {
-		processMessage(message, EstatusFacturacionEnum.NOTA_CREDITO);
-	}
-
-	@KafkaListener(topics = "${kafka.topic.invoice.cancel}")
-	public void receiveCancel(String message) {
-		logger.info("received message='{}'", message);
-		CancelacionFiscalResponse resp = null;
-		OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
-		if (repository.isAlreadyInvoiced(order, EstatusFacturacionEnum.CANCELACION)) {
-			logger.info("This order was already processed.");
-			return;
-		}
-		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
-		try {
-			resp = processCancelOrder(order);
-			if (resp != null && !resp.isError()) {
-				FacMovimientoFacturacion mov = buildCancelInvoiceMovement(order, EstatusFacturacionEnum.CANCELACION);
-				mailService.sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.CANCELACION), mailService.builEmailBody(order), mov.getXml(), mov.getPdf());
-			} else {
-				buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, EstatusFacturacionEnum.CANCELACION);
-				this.mailService.send(emails, "ERROR: " + getSubject(order, EstatusFacturacionEnum.CANCELACION), mailService.builEmailBody(order, ReachCoreFacade.getErrorCode(resp) + ReachCoreFacade.getErrorMessage(resp) + "<br/>" + resp.getErrorMessage()));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			//buildInvoiceError("0", e.getMessage(), order, EstatusFacturacionEnum.CANCELACION);
-			buildInvoiceError("0", "Ocurrió un error en el proceso de facturación. Por favor contacte al administrador: " + e.getMessage(), order, EstatusFacturacionEnum.CANCELACION);
-		}
-		latch.countDown();
 	}
 
 	private void processMessage(String message, EstatusFacturacionEnum status) {
@@ -131,11 +94,6 @@ public class Receiver {
 		if (status == EstatusFacturacionEnum.FACTURA) {
 			Long id = registerInvoiceOrder(order);
 			order.setInvoiceOrderId(id);
-		} else if (status == EstatusFacturacionEnum.NOTA_CREDITO) {
-			logger.info("This order was already processed with errors.");
-			if (repository.isAlreadyOnError(order, status)) {
-				return;
-			}
 		}
 		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
 		try {
@@ -150,7 +108,6 @@ public class Receiver {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-//			buildInvoiceError("0", e.getMessage(), order, status);
 			buildInvoiceError("0", "Ocurrió un error en el proceso de facturación. Por favor contacte al administrador: " + e.getMessage(), order, status);
 			// sendErrorEmail
 		}
@@ -208,25 +165,6 @@ public class Receiver {
 			return null;
 		}
 		return null;
-	}
-
-	private CancelacionFiscalResponse processCancelOrder(OrderToInvoice order) throws Exception {
-		//String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
-		ReachCoreFacade facade = new ReachCoreFacade(reachCoreCancelUrl, order.getApiKey());
-		CancelacionFiscalResponse resp = facade.cancelInvoice(order.getRfcAcreedora(), order.getId());
-		return resp;
-	}
-
-	private FacMovimientoFacturacion buildCancelInvoiceMovement(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {
-		FacMovimientoFacturacion mov = new FacMovimientoFacturacion();
-		mov.setFacOrdenFacturada(new FacOrdenFacturada(order.getInvoiceOrderId()));
-		mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
-		mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
-		mov.setUuid(order.getId());
-		mov = repository.registerInvoiceMovement(mov);
-		mov.setPdf(this.retrievePdf(order.getApiKey(), order.getId()));
-		mov.setXml(this.retrieveXml(order.getApiKey(), order.getId()));
-		return mov;
 	}
 
 	private EmitirComprobanteResponse processOrder(OrderToInvoice order) throws Exception {
