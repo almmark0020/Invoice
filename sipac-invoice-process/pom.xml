@@ -15,7 +15,7 @@
   <groupId>mx.com.amis.sipac.invoice</groupId>
   <artifactId>sipac-invoice-process</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>SIPAC Invoice - Quartz Process</name>
   <description>Sistema de Pagos entre Compañías - Procesos Lote para Ordenes de Pago</description>
