@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -88,11 +87,16 @@ public class MailService {
 		helper.setSubject(subject);
 		helper.setText(msgTxt, true);
 		mailSender.send(message);
-		try {
-			this.mailSender.send(message);
-		}
-		catch(MailException ex){
-			System.err.println(ex.getMessage());
+		for (int i = 0; i < 3; i++) {
+			try {
+				logger.debug("trying to send email [" + i + "]...");
+				this.mailSender.send(message);
+				logger.debug("Finish Send...");
+				return "OK";
+			} catch (Exception ex) {
+				logger.debug("Error sending message: " + ex.getMessage());
+				ex.printStackTrace();
+			}
 		}
 		logger.debug("Finished Send...");
 		return "OK";
@@ -114,7 +118,17 @@ public class MailService {
 		helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
 		helper.addAttachment("XML.xml", new ByteArrayResource(xml));
 
-		mailSender.send(message);
+		for (int i = 0; i < 5; i++) {
+			logger.debug("trying to send email [" + i + "]...");
+			try {
+				mailSender.send(message);
+				logger.debug("Finish Send...");
+				return;
+			} catch (Exception ex) {
+				logger.debug("Error sending message: " + ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	private String[] getEmails(List<EmailToNotify> emailsToNotify) {

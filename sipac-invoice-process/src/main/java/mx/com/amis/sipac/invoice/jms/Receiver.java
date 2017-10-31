@@ -96,6 +96,9 @@ public class Receiver {
 	@KafkaListener(topics = "${kafka.topic.invoice.cancel}")
 	public void receiveCancel(String message) {
 		logger.info("received message='{}'", message);
+		if (message == null || message.equals("null")) {
+			return;
+		}
 		CancelacionFiscalResponse resp = null;
 		OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
 		if (repository.isAlreadyInvoiced(order, EstatusFacturacionEnum.CANCELACION)) {
@@ -122,6 +125,9 @@ public class Receiver {
 
 	private void processMessage(String message, EstatusFacturacionEnum status) {
 		logger.info("received message='{}'", message);
+		if (message == null || message.equals("null")) {
+			return;
+		}
 		EmitirComprobanteResponse resp = null;
 		OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
 		if (repository.isAlreadyInvoiced(order, status)) {
@@ -131,6 +137,9 @@ public class Receiver {
 		if (status == EstatusFacturacionEnum.FACTURA) {
 			Long id = registerInvoiceOrder(order);
 			order.setInvoiceOrderId(id);
+			String apiKey = repository.getApiKey(order);
+			logger.debug("apikey: " + apiKey);
+			order.setApiKey(apiKey);
 		} else if (status == EstatusFacturacionEnum.NOTA_CREDITO) {
 			logger.info("This order was already processed with errors.");
 			if (repository.isAlreadyOnError(order, status)) {
@@ -297,14 +306,18 @@ public class Receiver {
 
 	private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 	private String getDescription(OrderToInvoice order) {
-		return invDescription.replaceAll("%sin%", order.getSiniestroAcreedor())
+		invDescription = invDescription.replaceAll("%sin%", order.getSiniestroAcreedor())
 				.replaceAll("%folio%", order.getFolio())
 				.replaceAll("%sinr%", order.getSiniestroDeudor())
 				.replaceAll("%polr%", order.getPolizaDeudor())
 				.replaceAll("%pola%", order.getPolizaAcreedor())
 				.replaceAll("%sina%", order.getSiniestroAcreedor())
-				.replaceAll("%sinc%", order.getSiniestroCorrecto())
+//				.replaceAll("%sinc%", order.getSiniestroCorrecto())
 				.replaceAll("%fec%", format.format(order.getFechaEstatus()));
+		if (order.getSiniestroCorrecto() != null) {
+			invDescription.replaceAll("%sinc%", order.getSiniestroCorrecto());
+		}
+		return invDescription;
 	}
 
 	private Comprobante buildPaymentComplement(OrderToInvoice order) {

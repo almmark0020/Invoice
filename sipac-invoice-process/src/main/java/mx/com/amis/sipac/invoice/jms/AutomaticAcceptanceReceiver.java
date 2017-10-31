@@ -18,7 +18,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 
 import com.google.gson.Gson;
 import com.reachcore.services.api.ws.pacservices._6.EmitirComprobanteResponse;
-import com.reachcore.services.api.ws.timbre_fiscal.cancelacion._2.CancelacionFiscalResponse;
 
 import mx.com.amis.sipac.invoice.persistence.domain.Compania;
 import mx.com.amis.sipac.invoice.persistence.domain.EstatusFacturacionEnum;
@@ -94,6 +93,9 @@ public class AutomaticAcceptanceReceiver {
 		if (status == EstatusFacturacionEnum.FACTURA) {
 			Long id = registerInvoiceOrder(order);
 			order.setInvoiceOrderId(id);
+			String apiKey = repository.getApiKey(order);
+			logger.debug("apikey: " + apiKey);
+			order.setApiKey(apiKey);
 		}
 		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
 		try {
