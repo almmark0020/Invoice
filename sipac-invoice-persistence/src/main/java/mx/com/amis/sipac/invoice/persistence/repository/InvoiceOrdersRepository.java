@@ -38,7 +38,7 @@ public class InvoiceOrdersRepository {
 		//orders.addAll(getOrdersToInvoice(OrderTypeEnum.GASTOS_MEDICOS.getTypeId()));
 		return orders;
 	}
-	
+
 	public List<OrderToInvoice> getOrdersAutAcceptanceToInvoice() {
 		List<OrderToInvoice> orders = new ArrayList<OrderToInvoice>();
 		orders.addAll(getOrdersAutAcceptanceToInvoice(OrderTypeEnum.DANOS_MATERIALES.getTypeId()));
@@ -87,8 +87,9 @@ public class InvoiceOrdersRepository {
 				+ " cia_acc.LUGAR_EXPEDICION_CP as \"cp\","
 				+ " (select VALOR from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID "
 				+ " and INICIO_VIGENCIA = (select MAX(INICIO_VIGENCIA) from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID)) as \"monto\","
-				+ " '" + orderType + "' as \"tipoOrden\","
-				+ " api.APIKEY as \"apiKey\""
+				+ " '" + orderType + "' as \"tipoOrden\", "
+				+ " ' ' as \"apiKey\" "
+				//+ " api.APIKEY as \"apiKey\""
 				+ " from (select * from " + getTableByOrderType(orderType) + " (INDEX FECHA_ESTATUS)"
 				+ " where FECHA_ESTATUS >= CAST(convert(varchar, dateadd(day, -3, getdate()), 101) as DATE)"
 				+ " and ORIGEN != 'R') ord"
@@ -99,15 +100,15 @@ public class InvoiceOrdersRepository {
 				+ " join SINIESTROS sin on ord.SINIESTRO_ID = sin.SINIESTRO_ID"
 				+ " join COMPANIAS cia_deu on sin.CIA_DEUDORA = cia_deu.CIA_ID"
 				+ " join COMPANIAS cia_acc on ord.CIA_ACREEDORA = cia_acc.CIA_ID"
-				+ " left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1"
+				//+ " left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1"
 				+ " join TIPO_VEHICULO tv on ord.TIPO_ID = tv.TIPO_ID"
 				+ " join MARCAS mar on mar.MARCA_ID = tv.MARCA_ID"
 				+ " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
 				+ "     and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
-				+ " left join FAC_MOVIMIENTO_FACTURACION mov "
+				+ " left join FAC_MOVIMIENTO_FACTURACION mov (INDEX ID_ORDEN_FACTURADA) "
 				+ "     on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
 				+ "     and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId()
-				+ " left join FAC_MOVIMIENTO_ERROR err "
+				+ " left join FAC_MOVIMIENTO_ERROR err (INDEX ID_ORDEN_FACTURADA) "
 				+ "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
 				+ "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") "
 				+ "     and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId()
@@ -119,7 +120,7 @@ public class InvoiceOrdersRepository {
 		Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
 		return q.getResultList();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<OrderToInvoice> getOrdersAutAcceptanceToInvoice(String orderType) {
 		logger.debug("getOrdersToInvoice...");
@@ -140,8 +141,9 @@ public class InvoiceOrdersRepository {
 				+ " cia_acc.LUGAR_EXPEDICION_CP as \"cp\","
 				+ " (select VALOR from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID "
 				+ " and INICIO_VIGENCIA = (select MAX(INICIO_VIGENCIA) from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID)) as \"monto\","
-				+ " '" + orderType + "' as \"tipoOrden\","
-				+ " api.APIKEY as \"apiKey\""
+				+ " '" + orderType + "' as \"tipoOrden\", "
+				+ " ' ' as \"apiKey\" "
+				//+ " api.APIKEY as \"apiKey\""
 				+ " from (select * from " + getTableByOrderType(orderType) + " (INDEX FECHA_ESTATUS)"
 				+ " where FECHA_ESTATUS >= CAST(convert(varchar, dateadd(day, -3, getdate()), 101) as DATE)"
 				+ " and ORIGEN != 'R') ord"
@@ -152,15 +154,15 @@ public class InvoiceOrdersRepository {
 				+ " join SINIESTROS sin on ord.SINIESTRO_ID = sin.SINIESTRO_ID"
 				+ " join COMPANIAS cia_deu on sin.CIA_DEUDORA = cia_deu.CIA_ID"
 				+ " join COMPANIAS cia_acc on ord.CIA_ACREEDORA = cia_acc.CIA_ID"
-				+ " left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1"
+				//+ " left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1"
 				+ " join TIPO_VEHICULO tv on ord.TIPO_ID = tv.TIPO_ID"
 				+ " join MARCAS mar on mar.MARCA_ID = tv.MARCA_ID"
 				+ " left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID"
 				+ "     and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = '" + orderType + "' and fac.CIA_DEUDORA = sin.CIA_DEUDORA "
-				+ " left join FAC_MOVIMIENTO_FACTURACION mov "
+				+ " left join FAC_MOVIMIENTO_FACTURACION mov (INDEX ID_ORDEN_FACTURADA) "
 				+ "     on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
 				+ "     and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId()
-				+ " left join FAC_MOVIMIENTO_ERROR err "
+				+ " left join FAC_MOVIMIENTO_ERROR err (INDEX ID_ORDEN_FACTURADA) "
 				+ "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
 				+ "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") "
 				+ "     and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId()
@@ -229,7 +231,7 @@ public class InvoiceOrdersRepository {
 				+ " and err.ID_MOVIMIENTO_ERROR = null "
 				//+ " and ord.FECHA_ESTATUS >= CAST(convert(varchar, dateadd(day, -3, getdate()), 101) as DATE) "
 				+ " and bita.ESTATUS_ID in (" + getStatusString(this.getPaidStatus()) + ")";
-				//+ " and ord.ORIGEN != 'R' ";
+		//+ " and ord.ORIGEN != 'R' ";
 		Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
 		return q.getResultList();
 	}
@@ -286,56 +288,56 @@ public class InvoiceOrdersRepository {
 
 	@SuppressWarnings("unchecked")
 	public List<OrderToInvoice> getRefundOrders(String orderType) {
-//		String queryString = "select distinct " + 
-//				" fac.ID_ORDEN_FACTURADA as \"invoiceOrderId\", " + 
-//				" (select UUID  " + 
-//				"             from FAC_MOVIMIENTO_FACTURACION  " + 
-//				"             where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA  " + 
-//				"         and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId() + ") as id," + 
-//				"         sin.SINIESTRO_ID as \"siniestroId\", " + 
-//				"         ord.FOLIO_ORDEN as \"folio\", " 
-//				+ " sin.SINIESTRO_ID as \"siniestroId\","
-//				+ " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
-//				+ " ord.SINIESTRO_ACREEDOR as \"siniestroAcreedor\","
-//				+ " ord.SINIESTRO_CORRECTO as \"siniestroCorrecto\","
-//				+ " sin.POLIZA as \"polizaDeudor\","
-//				+ " ord.POLIZA_ACREEDOR as \"polizaAcreedor\"," +
-//				"         ord.ESTATUS_ID as \"estatus\" , ord.FECHA_ESTATUS as \"fechaEstatus\", " + 
-//				"         sin.CIA_DEUDORA as \"ciaDeudora\", cia_deu.RFC as \"rfcDeudora\", " + 
-//				"         cia_deu.RAZON_SOCIAL as \"razonSocialDeudora\", cia_deu.REGIMEN_FISCAL as \"regimeFiscalDeudora\", " + 
-//				"         sinNuevo.CIA_DEUDORA as \"ciaAcreedora\", cia_acc.RFC as \"rfcAcreedora\", " + 
-//				"         cia_acc.RAZON_SOCIAL as \"razonSocialAcreedora\", cia_acc.REGIMEN_FISCAL as \"regimeFiscalAcreedora\", " + 
-//				"         (select VALOR from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID  " + 
-//				"         and INICIO_VIGENCIA = (select MAX(INICIO_VIGENCIA) from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID)) as \"monto\", " +
-//				" cia_acc.LUGAR_EXPEDICION_CP as \"cp\"," +
-//				"         'D' as \"tipoOrden\", " + 
-//				"         api.APIKEY as \"apiKey\" " + 
-//				" from " + getTableByOrderType(orderType) + " ord (INDEX FECHA_ESTATUS) "
-//				+ " join BIT_ORDENES_DANO_MATERIAL bita (INDEX PK_BIT_ORDENES_DANO_MATERIAL)"
-//				+ " on bita.SINIESTRO_ID = ord.SINIESTRO_ID"
-//				+ " and bita.FOLIO_ORDEN = ord.FOLIO_ORDEN" +
-//				"         join SINIESTROS sin on sin.SINIESTRO_DEUDOR = ord.SINIESTRO_ACREEDOR and sin.CIA_DEUDORA = ord.CIA_ACREEDORA  " + 
-//				"         join SINIESTROS sinNuevo on ord.SINIESTRO_ID = sinNuevo.SINIESTRO_ID " + 
-//				"         join COMPANIAS cia_deu on sin.CIA_DEUDORA = cia_deu.CIA_ID " + 
-//				"         join COMPANIAS cia_acc on sinNuevo.CIA_DEUDORA = cia_acc.CIA_ID " + 
-//				"         left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1 " + 
-//				"         join TIPO_VEHICULO tv on ord.TIPO_ID = tv.TIPO_ID " + 
-//				"         join MARCAS mar on mar.MARCA_ID = tv.MARCA_ID " + 
-//				"         left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID " + 
-//				"         and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = 'D' and fac.CIA_DEUDORA = sin.CIA_DEUDORA  " + 
-//				"         left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA" +
-//				"  and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId()  
-//				+ " left join FAC_MOVIMIENTO_ERROR err "
-//				+ "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-//				+ "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() 
-//				+"      and REINTENTO = 0 " +
-//				"         where fac.ID_ORDEN_FACTURADA != null and " + 
-//				"         mov.ID_MOVIMIENTO_FACTURACION = null " + 
-//				" and err.ID_MOVIMIENTO_ERROR = null " +
-//				"         and ord.FECHA_ESTATUS >= CAST(convert(varchar, dateadd(day, -3, getdate()), 101) as DATE) " + 
-//				" and bita.ESTATUS_ID in (" + getStatusString(this.getPaidStatus()) + ")" +
-//				"         and ord.ORIGEN = 'R'";
-		
+		//		String queryString = "select distinct " + 
+		//				" fac.ID_ORDEN_FACTURADA as \"invoiceOrderId\", " + 
+		//				" (select UUID  " + 
+		//				"             from FAC_MOVIMIENTO_FACTURACION  " + 
+		//				"             where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA  " + 
+		//				"         and ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.FACTURA.getEstatusId() + ") as id," + 
+		//				"         sin.SINIESTRO_ID as \"siniestroId\", " + 
+		//				"         ord.FOLIO_ORDEN as \"folio\", " 
+		//				+ " sin.SINIESTRO_ID as \"siniestroId\","
+		//				+ " sin.SINIESTRO_DEUDOR as \"siniestroDeudor\","
+		//				+ " ord.SINIESTRO_ACREEDOR as \"siniestroAcreedor\","
+		//				+ " ord.SINIESTRO_CORRECTO as \"siniestroCorrecto\","
+		//				+ " sin.POLIZA as \"polizaDeudor\","
+		//				+ " ord.POLIZA_ACREEDOR as \"polizaAcreedor\"," +
+		//				"         ord.ESTATUS_ID as \"estatus\" , ord.FECHA_ESTATUS as \"fechaEstatus\", " + 
+		//				"         sin.CIA_DEUDORA as \"ciaDeudora\", cia_deu.RFC as \"rfcDeudora\", " + 
+		//				"         cia_deu.RAZON_SOCIAL as \"razonSocialDeudora\", cia_deu.REGIMEN_FISCAL as \"regimeFiscalDeudora\", " + 
+		//				"         sinNuevo.CIA_DEUDORA as \"ciaAcreedora\", cia_acc.RFC as \"rfcAcreedora\", " + 
+		//				"         cia_acc.RAZON_SOCIAL as \"razonSocialAcreedora\", cia_acc.REGIMEN_FISCAL as \"regimeFiscalAcreedora\", " + 
+		//				"         (select VALOR from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID  " + 
+		//				"         and INICIO_VIGENCIA = (select MAX(INICIO_VIGENCIA) from CPS where TIPO_TRANS_GM = mar.TIPO_TRANS_ID)) as \"monto\", " +
+		//				" cia_acc.LUGAR_EXPEDICION_CP as \"cp\"," +
+		//				"         'D' as \"tipoOrden\", " + 
+		//				"         api.APIKEY as \"apiKey\" " + 
+		//				" from " + getTableByOrderType(orderType) + " ord (INDEX FECHA_ESTATUS) "
+		//				+ " join BIT_ORDENES_DANO_MATERIAL bita (INDEX PK_BIT_ORDENES_DANO_MATERIAL)"
+		//				+ " on bita.SINIESTRO_ID = ord.SINIESTRO_ID"
+		//				+ " and bita.FOLIO_ORDEN = ord.FOLIO_ORDEN" +
+		//				"         join SINIESTROS sin on sin.SINIESTRO_DEUDOR = ord.SINIESTRO_ACREEDOR and sin.CIA_DEUDORA = ord.CIA_ACREEDORA  " + 
+		//				"         join SINIESTROS sinNuevo on ord.SINIESTRO_ID = sinNuevo.SINIESTRO_ID " + 
+		//				"         join COMPANIAS cia_deu on sin.CIA_DEUDORA = cia_deu.CIA_ID " + 
+		//				"         join COMPANIAS cia_acc on sinNuevo.CIA_DEUDORA = cia_acc.CIA_ID " + 
+		//				"         left join FAC_COMPANIA_APIKEY api on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1 " + 
+		//				"         join TIPO_VEHICULO tv on ord.TIPO_ID = tv.TIPO_ID " + 
+		//				"         join MARCAS mar on mar.MARCA_ID = tv.MARCA_ID " + 
+		//				"         left join FAC_ORDEN_FACTURADA fac on fac.ID_SINIESTRO = sin.SINIESTRO_ID " + 
+		//				"         and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = 'D' and fac.CIA_DEUDORA = sin.CIA_DEUDORA  " + 
+		//				"         left join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA" +
+		//				"  and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId()  
+		//				+ " left join FAC_MOVIMIENTO_ERROR err "
+		//				+ "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
+		//				+ "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() 
+		//				+"      and REINTENTO = 0 " +
+		//				"         where fac.ID_ORDEN_FACTURADA != null and " + 
+		//				"         mov.ID_MOVIMIENTO_FACTURACION = null " + 
+		//				" and err.ID_MOVIMIENTO_ERROR = null " +
+		//				"         and ord.FECHA_ESTATUS >= CAST(convert(varchar, dateadd(day, -3, getdate()), 101) as DATE) " + 
+		//				" and bita.ESTATUS_ID in (" + getStatusString(this.getPaidStatus()) + ")" +
+		//				"         and ord.ORIGEN = 'R'";
+
 		String queryString = "select distinct " + 
 				" fac.ID_ORDEN_FACTURADA as \"invoiceOrderId\",   " + 
 				" (select UUID from FAC_MOVIMIENTO_FACTURACION where ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA and ID_ESTATUS_FACTURACION = 2) as id,          " + 
@@ -364,18 +366,18 @@ public class InvoiceOrdersRepository {
 				" join FAC_ORDEN_FACTURADA fac (INDEX SINIESTRO_ID) " + 
 				"	on fac.ID_SINIESTRO = sin.SINIESTRO_ID and fac.FOLIO = ord.FOLIO_ORDEN and fac.TIPO_ORDEN = 'D'  " + 
 				"	and fac.CIA_DEUDORA = sin.CIA_DEUDORA " + 
-//				" left join FAC_MOVIMIENTO_FACTURACION mov (INDEX ID_ORDEN_FACTURADA)  " + 
-//				"	on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA  and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() + 
-//				" left join FAC_MOVIMIENTO_ERROR err (INDEX ID_ORDEN_FACTURADA) " + 
-//				"	on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA       " + 
-//				"	and err.CODIGO_ERROR in (" + getDelayedStatus() + ")  " + 
-//				"	and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() +" and REINTENTO = 0 " + 
+				//				" left join FAC_MOVIMIENTO_FACTURACION mov (INDEX ID_ORDEN_FACTURADA)  " + 
+				//				"	on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA  and mov.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() + 
+				//				" left join FAC_MOVIMIENTO_ERROR err (INDEX ID_ORDEN_FACTURADA) " + 
+				//				"	on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA       " + 
+				//				"	and err.CODIGO_ERROR in (" + getDelayedStatus() + ")  " + 
+				//				"	and err.ID_ESTATUS_FACTURACION = " + EstatusFacturacionEnum.NOTA_CREDITO.getEstatusId() +" and REINTENTO = 0 " + 
 				" join SINIESTROS sinNuevo on sinNuevo.SINIESTRO_ID = ord.SINIESTRO_ID " + 
 				" join COMPANIAS cia_acc on cia_acc.CIA_ID = sinNuevo.CIA_DEUDORA " + 
 				" join FAC_COMPANIA_APIKEY api (INDEX COMPANIA_ID) on api.COMPANIA_ID = cia_acc.CIA_ID and api.ACTIVO = 1 " + 
-//				" where mov.ID_MOVIMIENTO_FACTURACION = null  " + 
-//				" and err.ID_MOVIMIENTO_ERROR = null"
-			 	"";
+				//				" where mov.ID_MOVIMIENTO_FACTURACION = null  " + 
+				//				" and err.ID_MOVIMIENTO_ERROR = null"
+				"";
 
 		Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
 		return q.getResultList();
@@ -397,20 +399,32 @@ public class InvoiceOrdersRepository {
 		return q.getResultList();
 	}
 
+	//	@SuppressWarnings("unchecked")
+	//	public List<EmailToNotify> getEmails(long companiaAcr, long companiaDeu) {
+	//		String queryString = "select USUARIO_ID as \"id\", "
+	//				+ " LOGIN_USUARIO as \"username\", "
+	//				+ " EMAIL as \"email\" "
+	//				+ " from USUARIOS"
+	//				+ " where CIA_ID in (" + companiaAcr + ", " + companiaDeu + ") "
+	//				+ " and NOTIFICAR_EMAIL = 1 and ESTATUS = 'A' ";
+	//		Query q = em.createNativeQuery (queryString, EmailToNotify.class);
+	//		return q.getResultList();
+	//	}
+
 	private List<String> getAcceptedStatus() {
 		List<String> statusList = new ArrayList<String>();
 		//		statusList.add(EstatusEnum.ACEPTACION_MANUAL_CONTROVERSIA.getEstatusId());
 		//		statusList.add(EstatusEnum.ACEPTACION_AUTOMATICA_CONTROVERSIA.getEstatusId());
 		//		statusList.add(EstatusEnum.ACEPTACION_COMITE_CONTROVERSIA.getEstatusId());
 		statusList.add(EstatusEnum.ACEPTACION_MANUAL.getEstatusId());
-//		statusList.add(EstatusEnum.ACEPTACION_AUTOMATICA.getEstatusId());
+		//		statusList.add(EstatusEnum.ACEPTACION_AUTOMATICA.getEstatusId());
 		statusList.add(EstatusEnum.ACEPTACION_AUTOMATICA_POR_MATCH.getEstatusId());
 		statusList.add(EstatusEnum.CONFIRMACION_DE_ACEPTACION_MANUAL.getEstatusId());
-//		statusList.add(EstatusEnum.CONFIRMACION_DE_ACEPTACION_AUTOMATICA.getEstatusId());
+		//		statusList.add(EstatusEnum.CONFIRMACION_DE_ACEPTACION_AUTOMATICA.getEstatusId());
 		statusList.add(EstatusEnum.CONFIRMACION_ACEPTACION_POR_COMITE.getEstatusId());
 		return statusList;
 	}
-	
+
 	private List<String> getAutAcceptedStatus() {
 		List<String> statusList = new ArrayList<String>();
 		statusList.add(EstatusEnum.ACEPTACION_AUTOMATICA.getEstatusId());
@@ -491,7 +505,7 @@ public class InvoiceOrdersRepository {
 		List<Object[]> result = q.getResultList();
 		return result != null && !result.isEmpty();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public boolean isAlreadyOnError(OrderToInvoice order, EstatusFacturacionEnum status) {
 		String queryString = "select " + 
@@ -507,5 +521,18 @@ public class InvoiceOrdersRepository {
 		Query q = em.createNativeQuery(queryString);
 		List<Object[]> result = q.getResultList();
 		return result != null && !result.isEmpty();
+	}
+
+	public String getApiKey(OrderToInvoice order) {
+		String result = "";
+		String queryString = "select APIKEY from FAC_COMPANIA_APIKEY "
+				+ " where COMPANIA_ID = " + order.getCiaAcreedora() + " and ACTIVO = 1";
+		Query q = em.createNativeQuery(queryString);
+		try {
+			result = (String) q.getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }
