@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -159,13 +158,13 @@ public class Receiver {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-//			buildInvoiceError("0", e.getMessage(), order, status);
+			//			buildInvoiceError("0", e.getMessage(), order, status);
 			buildInvoiceError("0", "Ocurrió un error en el proceso de facturación. Por favor contacte al administrador: " + e.getMessage(), order, status);
 			// sendErrorEmail
 		}
 		latch.countDown();
 	}
-	
+
 	private Long registerInvoiceOrder(OrderToInvoice orderToInv) {
 		FacOrdenFacturada order = new FacOrdenFacturada();
 		order.setFolio(orderToInv.getFolio());
@@ -263,6 +262,7 @@ public class Receiver {
 		compr.setTipoDeComprobante(CTipoDeComprobante.I);
 		compr.setMoneda(CMoneda.MXN);
 		compr.setLugarExpedicion(order.getCp());
+		compr.setFormaPago("03");
 
 		compr.setFecha(CfdiUtil.getXMLGregorianCalendar());
 		compr.setSubTotal(new BigDecimal(order.getMonto()));
@@ -277,7 +277,7 @@ public class Receiver {
 		Receptor receptor = new Receptor();
 		receptor.setRfc(order.getRfcDeudora());
 		receptor.setNombre(order.getRazonSocialDeudora());
-		receptor.setUsoCFDI(CUsoCFDI.P_01);
+		receptor.setUsoCFDI(CUsoCFDI.G_03);
 		compr.setReceptor(receptor);
 
 		Concepto concepto = new Concepto();
@@ -304,20 +304,32 @@ public class Receiver {
 		return compr;
 	}
 
-	private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+//	private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 	private String getDescription(OrderToInvoice order) {
-		invDescription = invDescription.replaceAll("%sin%", order.getSiniestroAcreedor())
-				.replaceAll("%folio%", order.getFolio())
-				.replaceAll("%sinr%", order.getSiniestroDeudor())
-				.replaceAll("%polr%", order.getPolizaDeudor())
-				.replaceAll("%pola%", order.getPolizaAcreedor())
-				.replaceAll("%sina%", order.getSiniestroAcreedor())
-//				.replaceAll("%sinc%", order.getSiniestroCorrecto())
-				.replaceAll("%fec%", format.format(order.getFechaEstatus()));
+		String desc = "INDEMNIZACION DE LA RECUPERACION DE SINIESTROS MODALIDAD SIPAC PERCEPCION DE LA INDEMNIZACION DE LA RECUPRACION ASOCIADA AL : ";
+		desc += ", Siniestro Acreedor: " + order.getPolizaAcreedor();
+		desc += ", Poliza Acreedor: " + order.getPolizaAcreedor();
 		if (order.getSiniestroCorrecto() != null) {
-			invDescription.replaceAll("%sinc%", order.getSiniestroCorrecto());
+			desc += ", Siniestro Correcto: " + order.getSiniestroCorrecto();
+		} else {
+			desc += ", Siniestro Deudor: " + order.getSiniestroDeudor();
 		}
-		return invDescription;
+		desc += ", Poliza Deudor: " + order.getPolizaDeudor();
+		desc += ", Actividad no objeto de IVA";
+
+		//		invDescription = invDescription.replaceAll("%sin%", order.getSiniestroAcreedor())
+		//				.replaceAll("%folio%", order.getFolio())
+		//				.replaceAll("%sinr%", order.getSiniestroDeudor())
+		//				.replaceAll("%polr%", order.getPolizaDeudor())
+		//				.replaceAll("%pola%", order.getPolizaAcreedor())
+		//				.replaceAll("%sina%", order.getSiniestroAcreedor())
+		//				.replaceAll("%fec%", format.format(order.getFechaEstatus()));
+		//		if (order.getSiniestroCorrecto() != null) {
+		//			invDescription.replaceAll("%sinc%", order.getSiniestroCorrecto());
+		//		}
+		//		return invDescription;
+
+		return desc;
 	}
 
 	private Comprobante buildPaymentComplement(OrderToInvoice order) {
@@ -338,9 +350,11 @@ public class Receiver {
 		compr.getConceptos().getConcepto().get(0).setClaveProdServ("84111506");
 		compr.getConceptos().getConcepto().get(0).setClaveUnidad("ACT");
 		compr.getConceptos().getConcepto().get(0).setUnidad(null);
-//		compr.getConceptos().getConcepto().get(0).setDescripcion(getDescription(order));
+		//		compr.getConceptos().getConcepto().get(0).setDescripcion(getDescription(order));
 		compr.getConceptos().getConcepto().get(0).setDescripcion("Pago");
-		
+		compr.getReceptor().setUsoCFDI(CUsoCFDI.P_01);
+		compr.setFormaPago(null);
+
 		Pagos compl = new Pagos();
 		compl.setVersion("1.0");
 		Pago paymt = new Pago();
@@ -368,10 +382,10 @@ public class Receiver {
 	private Comprobante buildCreditNote(OrderToInvoice order) {
 		Comprobante compr = buildComprobante(order);
 		compr.setTipoDeComprobante(CTipoDeComprobante.E);
-		compr.getConceptos().getConcepto().get(0).setClaveProdServ(cveProducto);
-		compr.getConceptos().getConcepto().get(0).setClaveUnidad("ACT");
+		//		compr.getConceptos().getConcepto().get(0).setClaveProdServ(cveProducto);
+		//		compr.getConceptos().getConcepto().get(0).setClaveUnidad("ACT");
 		compr.getConceptos().getConcepto().get(0).setUnidad(null);
-		compr.getConceptos().getConcepto().get(0).setDescripcion(getDescription(order));
+		//		compr.getConceptos().getConcepto().get(0).setDescripcion(getDescription(order));
 		CfdiRelacionados relatedInvoices = new CfdiRelacionados();
 		relatedInvoices.setTipoRelacion("01");
 		CfdiRelacionado relatedInvoice = new CfdiRelacionado();
