@@ -29,6 +29,9 @@ public class FacMovimientoFacturacion implements Serializable {
   @Transient
   private byte[] xml;
   
+  @Transient
+  private byte[] acuseSAT;
+  
   @Column(name="CFDI_PDF")
   private String cfdiPdf;
 
@@ -113,6 +116,14 @@ public class FacMovimientoFacturacion implements Serializable {
 
   public void setXml(byte[] xml) {
     this.xml = xml;
+  }
+
+  public byte[] getAcuseSAT() {
+    return acuseSAT;
+  }
+
+  public void setAcuseSAT(byte[] acuseSAT) {
+    this.acuseSAT = acuseSAT;
   }
 
   public String getCfdiPdf() {

@@ -29,6 +29,9 @@ public class MailService {
 
 	@Value("${default.dest.email}")
 	private String defaultEmail;
+	
+	@Value("${emulate.email}")
+    private String emulateEmail;
 
 	public String builEmailBody(OrderToInvoice order) {
 		return builEmailBody(order, null);
@@ -79,6 +82,10 @@ public class MailService {
 	}
 
 	public String send(List<EmailToNotify> toEmail, String subject, String msgTxt) throws MessagingException {
+	  if (emulateEmail.equals("true")) {
+	    logger.debug("emulated email sent...");
+	    return "OK";
+	  }
 		logger.debug("Starting Send...");
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -101,9 +108,18 @@ public class MailService {
 		logger.debug("Finished Send...");
 		return "OK";
 	}
+	
+	public void sendMessageWithAttachment(
+        List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf) throws MessagingException {
+	  sendMessageWithAttachment(toEmail, subject, text, xml, pdf, null);
+	}
 
 	public void sendMessageWithAttachment(
-			List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf) throws MessagingException {
+			List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf, byte[] acuseSAT) throws MessagingException {
+	  if (emulateEmail.equals("true")) {
+        logger.debug("emulated email sent...");
+        return;
+      }
 		MimeMessage message = mailSender.createMimeMessage();
 
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -117,6 +133,9 @@ public class MailService {
 
 		helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
 		helper.addAttachment("XML.xml", new ByteArrayResource(xml));
+		if (acuseSAT != null) {
+		  helper.addAttachment("AcuseSAT.xml", new ByteArrayResource(acuseSAT));
+		}
 
 		for (int i = 0; i < 5; i++) {
 			logger.debug("trying to send email [" + i + "]...");

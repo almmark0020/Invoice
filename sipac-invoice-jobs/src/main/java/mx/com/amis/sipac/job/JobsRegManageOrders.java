@@ -31,7 +31,9 @@ public class JobsRegManageOrders {
 	public void procesaRegistrado() {
 		logger.debug("Start quartz process...");
 		List<OrderToInvoice> orders = repository.getAcceptedOrdersToInvoice();
+		logger.debug("total: " + orders.size());
 		for(OrderToInvoice order : orders) {
+		  logger.debug(" +++ Order : " + order);
 			//Long id = registerInvoiceOrder(order);
 			//order.setInvoiceOrderId(id);
 			sender.send(order, topic);

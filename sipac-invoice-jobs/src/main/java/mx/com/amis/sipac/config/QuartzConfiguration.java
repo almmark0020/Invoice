@@ -23,10 +23,10 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingJobsManageOrders().getObject()); //Registrado
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger");
     stFactory.setGroup("mygroup");
-    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
     return stFactory;
   }
   
@@ -50,10 +50,10 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerCancelFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingCancelInvoicesJob().getObject()); //Registrado
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger2");
     stFactory.setGroup("mygroup2");
-    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
     return stFactory;
   }
 
@@ -77,10 +77,10 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerComplementFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingComplementInvoicesJob().getObject()); 
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger3");
     stFactory.setGroup("mygroup3");
-    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
     return stFactory;
   }
 
@@ -104,10 +104,10 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerCreditNoteFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingCreditNoteInvoicesJob().getObject());
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger4");
     stFactory.setGroup("mygroup4");
-    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
     return stFactory;
   }
 
@@ -133,10 +133,10 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerAutAcceptanceFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingAutAcceptanceInvoicesJob().getObject());
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger6");
     stFactory.setGroup("mygroup6");
-//    stFactory.setCronExpression("0 0/2 * * * ?"); // every minute
+//    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
 //    stFactory.setCronExpression("0 */12 * * * ?"); // every twelve hours
     stFactory.setCronExpression("0 1 7 * * ?"); // every day at 7:00 am
     return stFactory;
@@ -164,7 +164,7 @@ public class QuartzConfiguration {
   public CronTriggerFactoryBean cronTriggerRetryErrorsFactoryBean(){
     CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
     stFactory.setJobDetail(methodInvokingRetryErrorsJob().getObject());
-    stFactory.setStartDelay(3000);
+    stFactory.setStartDelay(1000);
     stFactory.setName("mytrigger5");
     stFactory.setGroup("mygroup5");
     stFactory.setCronExpression("0 0 0/8 * * ?"); // every eight hours

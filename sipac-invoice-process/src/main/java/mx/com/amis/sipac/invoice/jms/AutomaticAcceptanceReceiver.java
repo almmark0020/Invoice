@@ -324,7 +324,7 @@ public class AutomaticAcceptanceReceiver {
 		mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
 
 		mov.setUuid(compr.getUUID());
-		mov = repository.registerInvoiceMovement(mov);
+		mov = repository.registerInvoiceMovement(order, mov);
 
 		mov.setPdf(pdf);
 		mov.setXml(resp.getResult().getBytes());

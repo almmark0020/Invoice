@@ -145,6 +145,39 @@ CREATE TABLE FAC_USUARIO_BITACORA
 	constraint PK_FAC_USUARIO primary key (ID_USUARIO_BITACORA)
 );
 
+create table FAC_ORDEN_A_FACTURAR (
+  SINIESTRO_ID      int   not null,
+  FOLIO_ORDEN     varchar(25) not null,
+  ESTATUS_ID      char(1)   not null,
+  FECHA_ESTATUS     datetime  not null,
+
+  SINIESTRO_ACREEDOR    varchar(20) null,
+  SINIESTRO_DEUDOR    varchar(20) null,
+  SINIESTRO_CORRECTO    varchar(20) null,
+  ORIGEN        char(1)   null,
+  POLIZA_ACREEDOR     varchar(20) null,
+  POLIZA_DEUDOR     varchar(20) null,
+  MONTO       money   null,   
+  TIPO_ORDEN      char(1)   null,
+
+  CIA_ACREEDORA         int   null,   
+  NOMBRE_CIA_ACREEDORA    varchar(18) null,
+  RFC_ACREEDORA     varchar(14) null,
+  RAZON_SOCIAL_ACREEDORA    varchar(100)  null,
+  REGIMEN_FISCAL_ACREEDORA  varchar(4)  null,
+  CP_ACREEDORA      varchar(6)  null,
+
+  CIA_DEUDORA     int   null,
+  NOMBRE_CIA_DEUDORA    varchar(18) null,
+  RFC_DEUDORA     varchar(14) null,
+  RAZON_SOCIAL_DEUDORA    varchar(100)  null,
+  REGIMEN_FISCAL_DEUDORA    varchar(4)  null,
+
+  ID_ESTATUS_FACTURACION    int   null,
+
+  constraint PK_FAC_ORDEN_A_FACTURAR primary key (SINIESTRO_ID, FOLIO_ORDEN, ESTATUS_ID, FECHA_ESTATUS)
+);
+
 /* Create Foreign Keys */
 
 ALTER TABLE FAC_COMPANIA_APIKEY

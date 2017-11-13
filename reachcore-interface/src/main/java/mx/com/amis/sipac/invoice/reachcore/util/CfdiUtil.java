@@ -3,6 +3,7 @@ package mx.com.amis.sipac.invoice.reachcore.util;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
@@ -93,6 +94,9 @@ public class CfdiUtil {
   }
   
   public static XMLGregorianCalendar getXMLGregorianCalendar() {
-    return getXMLGregorianCalendar(new Date());
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DATE, -2);
+    return getXMLGregorianCalendar(cal.getTime());
+//    return getXMLGregorianCalendar(new Date());
   }
 }
