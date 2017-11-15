@@ -3,27 +3,29 @@ package mx.com.amis.sipac.invoice.jms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import com.google.gson.Gson;
-
 import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
+import mx.com.amis.sipac.utils.GsonHelper;
 
 @Service
-public class Sender {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
+public class EmailQueueSender {
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmailQueueSender.class);
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void send(OrderToInvoice order, String topic) {
-		String message = new Gson().toJson(order);
-		LOGGER.debug("message to send: " + message);
-		LOGGER.debug("kafkaTemplate: " + kafkaTemplate);
+	@Value("${kafka.topic.invoice.email}")
+	private String topic;
+
+	public void send(OrderToInvoice order) {
+		String message = GsonHelper.customGson.toJson(order);
+		//String message = new Gson().toJson(order);
 
 		// the KafkaTemplate provides asynchronous send methods returning a Future
 		ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);

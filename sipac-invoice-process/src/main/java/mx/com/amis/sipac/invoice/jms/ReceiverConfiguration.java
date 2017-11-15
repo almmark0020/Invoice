@@ -53,7 +53,7 @@ public class ReceiverConfiguration {
   }
   
   @Bean
-  public AutomaticAcceptanceReceiver automaticAcceptanceReceiver() {
-	  return new AutomaticAcceptanceReceiver();
+  public EmailReceiver emailReceiver() {
+	  return new EmailReceiver();
   }
 }

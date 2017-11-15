@@ -15,8 +15,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import mx.com.amis.sipac.invoice.persistence.domain.EstatusFacturacionEnum;
 import mx.com.amis.sipac.invoice.persistence.model.EmailToNotify;
 import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
+import mx.com.amis.sipac.invoice.persistence.repository.InvoiceOrdersRepository;
 
 @Service
 public class MailService {
@@ -29,16 +31,47 @@ public class MailService {
 
 	@Value("${default.dest.email}")
 	private String defaultEmail;
-	
+
 	@Value("${emulate.email}")
-    private String emulateEmail;
+	private String emulateEmail;
+
+	@Autowired private InvoiceOrdersRepository repository;
+
+	public void sendEmail(OrderToInvoice order) throws Exception {
+		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
+		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus()]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+	}
+
+	private String getSubject(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {
+		String subject = "";
+		switch(status){
+		case FACTURA:
+			subject = "Facturación SIPAC: Factura - ";
+			break;
+		case COMPLEMENTO:
+			subject = "Facturación SIPAC: Complemento de Pago - ";
+			break;
+		case NOTA_CREDITO:
+			subject = "Facturación SIPAC: Nota de Crédito - ";
+			break;
+		case CANCELACION:
+			subject = "Facturación SIPAC: Factura Cancelada - ";
+			break;
+		default:
+			return "";
+		}
+		return subject + "FOLIO: " + order.getFolio() 
+		+ ", SINIESTRO DEUDOR: " + order.getSiniestroDeudor() 
+		+ ", SINIESTRO ACREEDOR: " + order.getSiniestroAcreedor() 
+		+ ", CIA DEUDORA: " + order.getCiaDeudora() 
+		+ ", CIA ACREEDORA: " + order.getCiaAcreedora();
+	}
 
 	public String builEmailBody(OrderToInvoice order) {
 		return builEmailBody(order, null);
 	}
 
 	public String builEmailBody(OrderToInvoice order, String errorMsg) {
-
 		StringBuffer sb = new StringBuffer();
 		if (errorMsg == null) {
 			//sb.append("<h3>Factura Generada</h3>");
@@ -82,10 +115,10 @@ public class MailService {
 	}
 
 	public String send(List<EmailToNotify> toEmail, String subject, String msgTxt) throws MessagingException {
-	  if (emulateEmail.equals("true")) {
-	    logger.debug("emulated email sent...");
-	    return "OK";
-	  }
+		if (emulateEmail.equals("true")) {
+			logger.debug("emulated email sent...");
+			return "OK";
+		}
 		logger.debug("Starting Send...");
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -108,18 +141,18 @@ public class MailService {
 		logger.debug("Finished Send...");
 		return "OK";
 	}
-	
+
 	public void sendMessageWithAttachment(
-        List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf) throws MessagingException {
-	  sendMessageWithAttachment(toEmail, subject, text, xml, pdf, null);
+			List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf) throws MessagingException {
+		sendMessageWithAttachment(toEmail, subject, text, xml, pdf, null);
 	}
 
 	public void sendMessageWithAttachment(
 			List<EmailToNotify> toEmail, String subject, String text, byte[] xml, byte[] pdf, byte[] acuseSAT) throws MessagingException {
-	  if (emulateEmail.equals("true")) {
-        logger.debug("emulated email sent...");
-        return;
-      }
+		if (emulateEmail.equals("true")) {
+			logger.debug("emulated email sent...");
+			return;
+		}
 		MimeMessage message = mailSender.createMimeMessage();
 
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -134,7 +167,7 @@ public class MailService {
 		helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
 		helper.addAttachment("XML.xml", new ByteArrayResource(xml));
 		if (acuseSAT != null) {
-		  helper.addAttachment("AcuseSAT.xml", new ByteArrayResource(acuseSAT));
+			helper.addAttachment("AcuseSAT.xml", new ByteArrayResource(acuseSAT));
 		}
 
 		for (int i = 0; i < 5; i++) {
