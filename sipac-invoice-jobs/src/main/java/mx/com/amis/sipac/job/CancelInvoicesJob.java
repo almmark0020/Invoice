@@ -1,4 +1,5 @@
 package mx.com.amis.sipac.job;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,8 +27,10 @@ public class CancelInvoicesJob {
 
   public void process() {
     logger.debug("Start quartz process...");
+    Timestamp ts = new Timestamp(System.currentTimeMillis());
     List<OrderToInvoice> orders = repository.getCancelledOrdersToInvoice();
     for(OrderToInvoice order : orders) {
+      order.setStartDate(ts);
       sender.send(order, topic);
     }
     logger.debug("End quartz process.");

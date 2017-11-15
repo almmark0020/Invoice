@@ -30,9 +30,11 @@ public class JobsRegManageOrders {
 
 	public void procesaRegistrado() {
 		logger.debug("Start quartz process...");
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		List<OrderToInvoice> orders = repository.getAcceptedOrdersToInvoice();
 		logger.debug("total: " + orders.size());
 		for(OrderToInvoice order : orders) {
+		  order.setStartDate(ts);
 		  logger.debug(" +++ Order : " + order);
 			//Long id = registerInvoiceOrder(order);
 			//order.setInvoiceOrderId(id);

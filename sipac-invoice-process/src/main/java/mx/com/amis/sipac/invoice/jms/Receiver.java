@@ -134,6 +134,8 @@ public class Receiver {
 				buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, status);
 				order.setError(ReachCoreFacade.getErrorCode(resp) + ReachCoreFacade.getErrorMessage(resp) + "<br/>" + resp.getError().toString());
 			}
+			Timestamp ts = new Timestamp(System.currentTimeMillis());
+			order.setEndReachCoreDate(ts);
 			emailSender.send(order);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,7 +149,9 @@ public class Receiver {
 		if (message == null || message.equals("null")) {
 			return null;
 		}
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
+		order.setStartReachcoreDate(ts);
 		order.setInvoiceStatus(status.ordinal());
 		String apiKey = repository.getApiKey(order);
 		logger.debug("apikey: " + apiKey);

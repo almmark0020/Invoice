@@ -1,5 +1,7 @@
 package mx.com.amis.sipac.invoice.jms;
 
+import java.sql.Timestamp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,11 @@ public class Sender {
 	private KafkaTemplate<String, String> kafkaTemplate;
 
 	public void send(OrderToInvoice order, String topic) {
+	  if (order == null) {
+	    return;
+	  }
+	  Timestamp ts = new Timestamp(System.currentTimeMillis());
+      order.setQueueDate(ts);
 		String message = new Gson().toJson(order);
 		LOGGER.debug("message to send: " + message);
 		LOGGER.debug("kafkaTemplate: " + kafkaTemplate);

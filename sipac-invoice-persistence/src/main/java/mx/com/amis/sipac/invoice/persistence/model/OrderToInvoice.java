@@ -47,20 +47,27 @@ public class OrderToInvoice implements Serializable {
 	private byte[] acuseSAT;
 	@Transient
 	private String error;
+	
 	@Transient
-	private String log;
+	private Timestamp startDate;
+	@Transient
+	private Timestamp endDate;
+	@Transient
+    private Timestamp queueDate;
+	@Transient
+    private Timestamp startReachcoreDate;
+    @Transient
+    private Timestamp endReachCoreDate;
+	@Transient
+    private Timestamp startSendEmailDate;
+    @Transient
+    private Timestamp endSendEmailDate;
 
 	public String getError() {
 		return error;
 	}
 	public void setError(String error) {
 		this.error = error;
-	}
-	public String getLog() {
-		return log;
-	}
-	public void setLog(String log) {
-		this.log = log;
 	}
 	public int getInvoiceStatus() {
 		return invoiceStatus;
@@ -224,4 +231,46 @@ public class OrderToInvoice implements Serializable {
 	public void setSiniestroCorrecto(String siniestroCorrecto) {
 		this.siniestroCorrecto = siniestroCorrecto;
 	}
+  public Timestamp getStartDate() {
+    return startDate;
+  }
+  public void setStartDate(Timestamp startDate) {
+    this.startDate = startDate;
+  }
+  public Timestamp getEndDate() {
+    return endDate;
+  }
+  public void setEndDate(Timestamp endDate) {
+    this.endDate = endDate;
+  }
+  public Timestamp getStartReachcoreDate() {
+    return startReachcoreDate;
+  }
+  public void setStartReachcoreDate(Timestamp startReachcoreDate) {
+    this.startReachcoreDate = startReachcoreDate;
+  }
+  public Timestamp getEndReachCoreDate() {
+    return endReachCoreDate;
+  }
+  public void setEndReachCoreDate(Timestamp endReachCoreDate) {
+    this.endReachCoreDate = endReachCoreDate;
+  }
+  public Timestamp getStartSendEmailDate() {
+    return startSendEmailDate;
+  }
+  public void setStartSendEmailDate(Timestamp startSendEmailDate) {
+    this.startSendEmailDate = startSendEmailDate;
+  }
+  public Timestamp getEndSendEmailDate() {
+    return endSendEmailDate;
+  }
+  public void setEndSendEmailDate(Timestamp endSendEmailDate) {
+    this.endSendEmailDate = endSendEmailDate;
+  }
+  public Timestamp getQueueDate() {
+    return queueDate;
+  }
+  public void setQueueDate(Timestamp queueDate) {
+    this.queueDate = queueDate;
+  }
 }

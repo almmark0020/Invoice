@@ -16,12 +16,12 @@ import com.google.gson.JsonSerializer;
 
 public class GsonHelper {
 	public static final Gson customGson = new GsonBuilder()
-			.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+			/*.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
 				@Override
 				public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 					return new Date(json.getAsLong());
 				}
-			})
+			})*/
 			.registerTypeHierarchyAdapter(byte[].class,
 					new ByteArrayToBase64TypeAdapter()).create();
 
