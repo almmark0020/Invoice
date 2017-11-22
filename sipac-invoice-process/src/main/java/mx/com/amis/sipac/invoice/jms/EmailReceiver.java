@@ -69,7 +69,7 @@ public class EmailReceiver {
 	    output.append(order.getSiniestroId() + "," 
 	        + order.getFolio() + "," 
 	        + order.getEstatus() + ","
-	        + EstatusFacturacionEnum.values()[order.getInvoiceStatus()].name() + ","
+	        + EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1].name() + ","
 	        + order.getStartDate() + ","
 	        + order.getQueueDate() + ","
 	        + order.getStartReachcoreDate() + ","

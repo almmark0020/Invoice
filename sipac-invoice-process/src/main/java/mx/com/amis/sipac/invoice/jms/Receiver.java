@@ -109,11 +109,14 @@ public class Receiver {
 			CancelacionFiscalResponse resp = processCancelOrder(order);
 			if (resp != null && !resp.isError()) {
 				order = buildCancelInvoiceMovement(order, EstatusFacturacionEnum.CANCELACION, resp.getAcuseSAT());
+				emailSender.send(order);
 			} else {
 				buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, EstatusFacturacionEnum.CANCELACION);
 				order.setError(ReachCoreFacade.getErrorCode(resp) + ReachCoreFacade.getErrorMessage(resp) + "<br/>" + resp.getErrorMessage());
+				notifyError(order);
 			}
-			emailSender.send(order);
+			Timestamp ts = new Timestamp(System.currentTimeMillis());
+			order.setEndReachCoreDate(ts);
 		} catch (Exception e) {
 			e.printStackTrace();
 			buildInvoiceError("0", "Ocurrió un error en el proceso de facturación. Por favor contacte al administrador: " + e.getMessage(), order, EstatusFacturacionEnum.CANCELACION);
@@ -130,18 +133,26 @@ public class Receiver {
 			EmitirComprobanteResponse resp = process(order, status);
 			if (resp != null && !ReachCoreFacade.hasErrors(resp)) {
 				order = buildInvoiceMovement(order, resp, status);
+				emailSender.send(order);
 			} else {
 				buildInvoiceError(ReachCoreFacade.getErrorCode(resp), ReachCoreFacade.getErrorMessage(resp), order, status);
 				order.setError(ReachCoreFacade.getErrorCode(resp) + ReachCoreFacade.getErrorMessage(resp) + "<br/>" + resp.getError().toString());
+				notifyError(order);
 			}
 			Timestamp ts = new Timestamp(System.currentTimeMillis());
 			order.setEndReachCoreDate(ts);
-			emailSender.send(order);
 		} catch (Exception e) {
 			e.printStackTrace();
 			buildInvoiceError("0", "Ocurrió un error en el proceso de facturación. Por favor contacte al administrador: " + e.getMessage(), order, status);
 		}
 		latch.countDown();
+	}
+	
+	private void notifyError(OrderToInvoice order) {
+		int retryAttempts = repository.getErrorRetryAttempts(order);
+		if (retryAttempts >= 10) {
+			emailSender.send(order);
+		}
 	}
 	
 	private OrderToInvoice buildOrder(String message, EstatusFacturacionEnum status) {
@@ -152,7 +163,7 @@ public class Receiver {
 		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
 		order.setStartReachcoreDate(ts);
-		order.setInvoiceStatus(status.ordinal());
+		order.setInvoiceStatus(status.getEstatusId());
 		String apiKey = repository.getApiKey(order);
 		logger.debug("apikey: " + apiKey);
 		order.setApiKey(apiKey);
@@ -163,6 +174,11 @@ public class Receiver {
 		if (status == EstatusFacturacionEnum.FACTURA) {
 			Long id = registerInvoiceOrder(order);
 			order.setInvoiceOrderId(id);
+		}
+		int retryAttempts = repository.getErrorRetryAttempts(order);
+		if (retryAttempts >= 10) {
+			logger.info("This order has been reached the limits of retry attempts to be processed.");
+			return null;
 		}
 		return order;
 	}
@@ -176,6 +192,32 @@ public class Receiver {
 		order.setCompania2(new Compania(orderToInv.getCiaDeudora()));
 		order.setFechaEstatusSipac(orderToInv.getFechaEstatus());
 		order.setEstatusSipac(orderToInv.getEstatus());
+		
+		order.setCapturado(orderToInv.getCapturado());
+		order.setCircunstanciaAcreedor(orderToInv.getCircunstanciaAcreedor());
+		order.setCircunstanciaDeudor(orderToInv.getCircunstanciaDeudor());
+		order.setContraparte(orderToInv.getContraparte());
+		order.setCosto(orderToInv.getCosto());
+		order.setDias(orderToInv.getDias());
+		order.setEstado(orderToInv.getEstado());
+		order.setFechaAceptacion(orderToInv.getFechaAceptacion());
+		order.setFechaConfirmacionPago(orderToInv.getFechaConfirmacionPago());
+		order.setFechaExpedicion(orderToInv.getFechaExpedicion());
+		order.setFechaPago(orderToInv.getFechaPago());
+		order.setFechaPrimerRechazo(orderToInv.getFechaPrimerRechazo());
+		order.setFechaRegistro(orderToInv.getFechaRegistro());
+		order.setFechaSiniestro(orderToInv.getFechaSiniestro());
+		order.setModificado(orderToInv.getModificado());
+		order.setMotivo(orderToInv.getMotivo());
+		order.setMunicipio(orderToInv.getMunicipio());
+		order.setObservacionesAcreedor(orderToInv.getObservacionesAcreedor());
+		order.setObservacionesComite(orderToInv.getObservacionesComite());
+		order.setObservacionesDeudor(orderToInv.getObservacionesDeudor());
+		order.setSancion(orderToInv.getSancion());
+		order.setTipoCaptura(orderToInv.getTipoCaptura());
+		order.setTipoTransporteAcreedor(orderToInv.getTipoTransporteAcreedor());
+		order.setTipoTransporteDeudor(orderToInv.getTipoTransporteDeudor());
+		
 		order = repository.registerInvoicedOrder(order);
 		return order.getIdOrdenFacturada();
 	}

@@ -78,12 +78,7 @@ public class InvoiceOrdersRepository {
         + " join FAC_MOVIMIENTO_FACTURACION mov on mov.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
         + "     and mov.ID_ESTATUS_FACTURACION = " 
         + (estatus == EstatusFacturacionEnum.NOTA_CREDITO ? EstatusFacturacionEnum.COMPLEMENTO.getEstatusId() : EstatusFacturacionEnum.FACTURA.getEstatusId())
-        + " left join FAC_MOVIMIENTO_ERROR err "
-        + "     on err.ID_ORDEN_FACTURADA = fac.ID_ORDEN_FACTURADA "
-        + "     and err.CODIGO_ERROR in (" + getDelayedStatus() + ") and err.ID_ESTATUS_FACTURACION = " + estatus.getEstatusId()
-        +"      and REINTENTO = 0 "
-        + " where ord.ORIGEN " + (estatus == EstatusFacturacionEnum.NOTA_CREDITO ? " = " : " != ") + " 'R' "
-        + " and err.ID_MOVIMIENTO_ERROR = null "
+		+ " where ord.ORIGEN " + (estatus == EstatusFacturacionEnum.NOTA_CREDITO ? " = " : " != ") + " 'R' "
         + " and ord.ESTATUS_ID in (" + getStatusString(statuses) + ") ";
     Query q = em.createNativeQuery (queryString, OrderToInvoice.class);
     return q.getResultList();
@@ -114,7 +109,31 @@ public class InvoiceOrdersRepository {
         + " ord.CP_ACREEDORA as \"cp\","
         + " ord.MONTO as \"monto\","
         + " ord.TIPO_ORDEN as \"tipoOrden\", "
-        + " '' as \"apiKey\" ";
+        + " '' as \"apiKey\","
+        + " ord.TIPO_CAPTURA as \"tipoCaptura\","
+        + " ord.FECHA_REGISTRO as \"fechaRegistro\","
+        + " ord.FECHA_ACEPTACION as \"fechaAceptacion\","
+        + " ord.FECHA_PAGO as \"fechaPago\","
+        + " ord.COSTO as \"costo\","
+        + " ord.FECHA_EXPEDICION as \"fechaExpedicion\","
+        + " ord.FECHA_SINIESTRO as \"fechaSiniestro\","
+        + " ord.ESTADO as \"estado\","
+        + " ord.MUNICIPIO as \"municipio\","
+        + " ord.SANCION as \"sancion\","
+        + " ord.CONTRAPARTE as \"contraparte\","
+        + " ord.DIAS as \"dias\","
+        + " ord.MOTIVO as \"motivo\","
+        + " ord.OBSERVACIONES_ACREEDOR as \"observacionesAcreedor\","
+        + " ord.OBSERVACIONES_DEUDOR as \"observacionesDeudor\","
+        + " ord.OBSERVACIONES_COMITE as \"observacionesComite\","
+        + " ord.CIRCUNSTANCIA_DEUDOR as \"circunstanciaDeudor\","
+        + " ord.CIRCUNSTANCIA_ACREEDOR as \"circunstanciaAcreedor\","
+        + " ord.CAPTURADO as \"capturado\","
+        + " ord.MODIFICADO as \"modificado\","
+        + " ord.TIPO_TRANSPORTE_DEUDOR as \"tipoTransporteDeudor\","
+        + " ord.TIPO_TRANSPORTE_ACREEDOR as \"tipoTransporteAcreedor\","
+        + " ord.FECHA_CONFIRMACION_PAGO as \"fechaConfirmacionPago\","
+        + " ord.FECHA_PRIMER_RECHAZO as \"fechaPrimerRechazo\" ";
     return fields;
   }
 
@@ -206,7 +225,21 @@ public class InvoiceOrdersRepository {
 
   @Transactional
   public FacMovimientoError registerInvoiceMovement(FacMovimientoError movement) {
-    return em.merge(movement);
+	  return em.merge(movement);
+  }
+  
+  public int getErrorRetryAttempts(OrderToInvoice order) {
+	  int reintentos = 0;
+	  String queryString = "select COUNT(*) from FAC_MOVIMIENTO_ERROR "
+			  + " where ID_ORDEN_FACTURADA = " + order.getInvoiceOrderId()
+			  + " and ID_ESTATUS_FACTURACION = " + order.getInvoiceStatus();
+	  Query q = em.createNativeQuery(queryString);
+	  try {
+		  reintentos = (Integer) q.getSingleResult();
+	  } catch (Exception e) {
+		  e.printStackTrace();
+	  }
+	  return reintentos;
   }
 
   @Transactional

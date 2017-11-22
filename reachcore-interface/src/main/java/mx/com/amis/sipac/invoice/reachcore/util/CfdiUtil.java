@@ -94,9 +94,9 @@ public class CfdiUtil {
   }
   
   public static XMLGregorianCalendar getXMLGregorianCalendar() {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -2);
-    return getXMLGregorianCalendar(cal.getTime());
-//    return getXMLGregorianCalendar(new Date());
+//    Calendar cal = Calendar.getInstance();
+//    cal.add(Calendar.DATE, -2);
+//    return getXMLGregorianCalendar(cal.getTime());
+    return getXMLGregorianCalendar(new Date());
   }
 }

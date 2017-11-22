@@ -145,13 +145,35 @@ public class QuartzConfiguration {
     stFactory.setCronExpression("0 1 5 * * ?"); // every day at 7:00 am
 //    stFactory.setCronExpression("0 1 11 * * ?"); // every day at 7:00 am
     return stFactory;
-  }
+  }  
 
   @Bean
   public SchedulerFactoryBean schedulerAutAcceptanceFactoryBean() {
     SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
     System.out.println("Iniciando el llamado ......");
     scheduler.setTriggers(cronTriggerAutAcceptanceFactoryBean().getObject());
+    return scheduler;
+  }
+  
+  @Bean
+  public CronTriggerFactoryBean cronTriggerAutAcceptanceFactoryBeanAux(){
+    CronTriggerFactoryBean stFactory = new CronTriggerFactoryBean();
+    stFactory.setJobDetail(methodInvokingAutAcceptanceInvoicesJob().getObject());
+    stFactory.setStartDelay(1000);
+    stFactory.setName("mytrigger6_Aux");
+    stFactory.setGroup("mygroup6_Aux");
+//    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
+//    stFactory.setCronExpression("0 */12 * * * ?"); // every twelve hours
+    stFactory.setCronExpression("0 13 2 * * ?"); // every day at 7:00 am
+//    stFactory.setCronExpression("0 1 11 * * ?"); // every day at 7:00 am
+    return stFactory;
+  }  
+
+  @Bean
+  public SchedulerFactoryBean schedulerAutAcceptanceFactoryBeanAux() {
+    SchedulerFactoryBean scheduler = new SchedulerFactoryBean();
+    System.out.println("Iniciando el llamado ......");
+    scheduler.setTriggers(cronTriggerAutAcceptanceFactoryBeanAux().getObject());
     return scheduler;
   }
   

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,44 +40,43 @@ public class MailService {
 
 	public void sendEmail(OrderToInvoice order) throws Exception {
 		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
-		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus()]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
 	}
 
 	private String getSubject(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {
-		String subject = "";
+		String subject = "Facturación SIPAC: ";
+		if (!StringUtils.isEmpty(order.getError())) {
+			subject += "ERROR";
+		}
 		switch(status){
 		case FACTURA:
-			subject = "Facturación SIPAC: Factura - ";
+			subject = " Factura - ";
 			break;
 		case COMPLEMENTO:
-			subject = "Facturación SIPAC: Complemento de Pago - ";
+			subject = " Complemento de Pago - ";
 			break;
 		case NOTA_CREDITO:
-			subject = "Facturación SIPAC: Nota de Crédito - ";
+			subject = " Nota de Crédito - ";
 			break;
 		case CANCELACION:
-			subject = "Facturación SIPAC: Factura Cancelada - ";
+			subject = " Factura Cancelada - ";
 			break;
 		default:
 			return "";
 		}
 		return subject + "FOLIO: " + order.getFolio() 
 		+ ", SINIESTRO DEUDOR: " + order.getSiniestroDeudor() 
-		+ ", SINIESTRO ACREEDOR: " + order.getSiniestroAcreedor() 
+		+ ", SINIESTRO ACREEDOR: " + order.getSiniestroAcreedor()
 		+ ", CIA DEUDORA: " + order.getCiaDeudora() 
 		+ ", CIA ACREEDORA: " + order.getCiaAcreedora();
 	}
 
 	public String builEmailBody(OrderToInvoice order) {
-		return builEmailBody(order, null);
-	}
-
-	public String builEmailBody(OrderToInvoice order, String errorMsg) {
 		StringBuffer sb = new StringBuffer();
-		if (errorMsg == null) {
+		if (order.getError() == null) {
 			//sb.append("<h3>Factura Generada</h3>");
 		} else {
-			sb.append("<h3>Error al generar la factura: " + errorMsg + " </h3>");
+			sb.append("<h3>Error al generar la factura: " + order.getError() + " </h3>");
 		}
 		sb.append("<table><tr>"
 				+ "<th>Folio</th>"
@@ -164,8 +164,12 @@ public class MailService {
 
 		logger.debug("xml to attach: " + xml);
 
-		helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
-		helper.addAttachment("XML.xml", new ByteArrayResource(xml));
+		if (pdf != null) {
+			helper.addAttachment("PDF.pdf", new ByteArrayResource(pdf));
+		}
+		if (xml != null) {
+			helper.addAttachment("XML.xml", new ByteArrayResource(xml));
+		}
 		if (acuseSAT != null) {
 			helper.addAttachment("AcuseSAT.xml", new ByteArrayResource(acuseSAT));
 		}
