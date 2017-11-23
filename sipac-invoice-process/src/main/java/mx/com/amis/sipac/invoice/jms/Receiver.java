@@ -193,6 +193,22 @@ public class Receiver {
 		order.setFechaEstatusSipac(orderToInv.getFechaEstatus());
 		order.setEstatusSipac(orderToInv.getEstatus());
 		
+		order.setSiniestroAcreedor(orderToInv.getSiniestroAcreedor());
+		order.setSiniestroDeudor(orderToInv.getSiniestroDeudor());
+		order.setSiniestroCorrecto(orderToInv.getSiniestroCorrecto());
+		order.setPolizaAcreedor(orderToInv.getPolizaAcreedor());
+		order.setPolizaDeudor(orderToInv.getPolizaDeudor());
+		order.setMonto(orderToInv.getMonto());
+		order.setRfcAcreedora(orderToInv.getRfcAcreedora());
+		order.setRfcDeudora(orderToInv.getRfcDeudora());
+		order.setRazonsocialAcreedora(orderToInv.getRazonSocialAcreedora());
+		order.setRazonSocialDeudora(orderToInv.getRazonSocialDeudora());
+		order.setRegimenfiscalAcreedora(orderToInv.getRegimeFiscalAcreedora());
+		order.setRegimenFiscalDeudora(orderToInv.getRegimeFiscalDeudora());
+		order.setCpAcreedora(orderToInv.getCp());
+		order.setNombreCiaAcreedora(orderToInv.getRazonSocialAcreedora());
+		order.setNombreCiaDeudora(orderToInv.getRazonSocialDeudora());
+		
 		order.setCapturado(orderToInv.getCapturado());
 		order.setCircunstanciaAcreedor(orderToInv.getCircunstanciaAcreedor());
 		order.setCircunstanciaDeudor(orderToInv.getCircunstanciaDeudor());
@@ -303,7 +319,7 @@ public class Receiver {
 
 	private String getDescription(OrderToInvoice order) {
 		String desc = "INDEMNIZACION DE LA RECUPERACION DE SINIESTROS MODALIDAD SIPAC PERCEPCION DE LA INDEMNIZACION DE LA RECUPRACION ASOCIADA AL : ";
-		desc += ", Siniestro Acreedor: " + order.getPolizaAcreedor();
+		desc += "Siniestro Acreedor: " + order.getSiniestroAcreedor();
 		desc += ", Poliza Acreedor: " + order.getPolizaAcreedor();
 		if (!StringUtils.isEmpty(order.getSiniestroCorrecto())) {
 			desc += ", Siniestro Correcto: " + order.getSiniestroCorrecto();

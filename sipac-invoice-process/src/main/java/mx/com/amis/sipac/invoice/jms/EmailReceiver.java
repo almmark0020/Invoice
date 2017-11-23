@@ -1,7 +1,6 @@
 package mx.com.amis.sipac.invoice.jms;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
@@ -30,8 +29,8 @@ public class EmailReceiver {
 	@Autowired 
 	private MailService mailService;
 
-	@Autowired(required = true)
-	private EmailQueueSender emailSender;
+//	@Autowired(required = true)
+//	private EmailQueueSender emailSender;
 	
 	@Value("${local.vault.location}")
     private String vaultPath;

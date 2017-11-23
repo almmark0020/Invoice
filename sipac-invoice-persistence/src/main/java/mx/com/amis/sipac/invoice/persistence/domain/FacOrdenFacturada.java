@@ -54,6 +54,55 @@ public class FacOrdenFacturada implements Serializable {
 
 	@Column(name="ESTATUS_SIPAC")
 	private String estatusSipac;
+	
+	
+	@Column(name="SINIESTRO_ACREEDOR")
+	private String siniestroAcreedor;
+	
+	@Column(name="SINIESTRO_DEUDOR")
+	private String siniestroDeudor;
+	
+	@Column(name="SINIESTRO_CORRECTO")
+	private String siniestroCorrecto;
+	
+	@Column(name="ORIGEN")
+	private String origen;
+	
+	@Column(name="POLIZA_ACREEDOR")
+	private String polizaAcreedor;
+	
+	@Column(name="POLIZA_DEUDOR")
+	private String polizaDeudor;
+	
+	@Column(name="MONTO")   
+	private Double monto; 
+	
+	@Column(name="NOMBRE_CIA_ACREEDORA")
+	private String nombreCiaAcreedora;
+	
+	@Column(name="RFC_ACREEDORA")
+	private String rfcAcreedora;
+	
+	@Column(name="RAZON_SOCIAL_ACREEDORA")
+	private String razonsocialAcreedora;
+	
+	@Column(name="REGIMEN_FISCAL_ACREEDORA")
+	private String regimenfiscalAcreedora; 
+	
+	@Column(name="CP_ACREEDORA")
+	private String cpAcreedora;
+	
+	@Column(name="NOMBRE_CIA_DEUDORA")
+	private String nombreCiaDeudora;
+	
+	@Column(name="RFC_DEUDORA")
+	private String rfcDeudora;
+	
+	@Column(name="RAZON_SOCIAL_DEUDORA")
+	private String razonSocialDeudora;
+	
+	@Column(name="REGIMEN_FISCAL_DEUDORA")
+	private String regimenFiscalDeudora;
 
 	@Column(name="TIPO_CAPTURA")
 	private String tipoCaptura;
@@ -432,6 +481,134 @@ public class FacOrdenFacturada implements Serializable {
 
 	public void setFechaPrimerRechazo(Timestamp fechaPrimerRechazo) {
 		this.fechaPrimerRechazo = fechaPrimerRechazo;
+	}
+
+	public String getSiniestroAcreedor() {
+		return siniestroAcreedor;
+	}
+
+	public void setSiniestroAcreedor(String siniestroAcreedor) {
+		this.siniestroAcreedor = siniestroAcreedor;
+	}
+
+	public String getSiniestroDeudor() {
+		return siniestroDeudor;
+	}
+
+	public void setSiniestroDeudor(String siniestroDeudor) {
+		this.siniestroDeudor = siniestroDeudor;
+	}
+
+	public String getSiniestroCorrecto() {
+		return siniestroCorrecto;
+	}
+
+	public void setSiniestroCorrecto(String siniestroCorrecto) {
+		this.siniestroCorrecto = siniestroCorrecto;
+	}
+
+	public String getOrigen() {
+		return origen;
+	}
+
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+
+	public String getPolizaAcreedor() {
+		return polizaAcreedor;
+	}
+
+	public void setPolizaAcreedor(String polizaAcreedor) {
+		this.polizaAcreedor = polizaAcreedor;
+	}
+
+	public String getPolizaDeudor() {
+		return polizaDeudor;
+	}
+
+	public void setPolizaDeudor(String polizaDeudor) {
+		this.polizaDeudor = polizaDeudor;
+	}
+
+	public Double getMonto() {
+		return monto;
+	}
+
+	public void setMonto(Double monto) {
+		this.monto = monto;
+	}
+
+	public String getNombreCiaAcreedora() {
+		return nombreCiaAcreedora;
+	}
+
+	public void setNombreCiaAcreedora(String nombreCiaAcreedora) {
+		this.nombreCiaAcreedora = nombreCiaAcreedora;
+	}
+
+	public String getRfcAcreedora() {
+		return rfcAcreedora;
+	}
+
+	public void setRfcAcreedora(String rfcAcreedora) {
+		this.rfcAcreedora = rfcAcreedora;
+	}
+
+	public String getRazonsocialAcreedora() {
+		return razonsocialAcreedora;
+	}
+
+	public void setRazonsocialAcreedora(String razonsocialAcreedora) {
+		this.razonsocialAcreedora = razonsocialAcreedora;
+	}
+
+	public String getRegimenfiscalAcreedora() {
+		return regimenfiscalAcreedora;
+	}
+
+	public void setRegimenfiscalAcreedora(String regimenfiscalAcreedora) {
+		this.regimenfiscalAcreedora = regimenfiscalAcreedora;
+	}
+
+	public String getCpAcreedora() {
+		return cpAcreedora;
+	}
+
+	public void setCpAcreedora(String cpAcreedora) {
+		this.cpAcreedora = cpAcreedora;
+	}
+
+	public String getNombreCiaDeudora() {
+		return nombreCiaDeudora;
+	}
+
+	public void setNombreCiaDeudora(String nombreCiaDeudora) {
+		this.nombreCiaDeudora = nombreCiaDeudora;
+	}
+
+	public String getRfcDeudora() {
+		return rfcDeudora;
+	}
+
+	public void setRfcDeudora(String rfcDeudora) {
+		this.rfcDeudora = rfcDeudora;
+	}
+
+	public String getRazonSocialDeudora() {
+		return razonSocialDeudora;
+	}
+
+	public void setRazonSocialDeudora(String razonSocialDeudora) {
+		this.razonSocialDeudora = razonSocialDeudora;
+	}
+
+	public String getRegimenFiscalDeudora() {
+		return regimenFiscalDeudora;
+	}
+
+	public void setRegimenFiscalDeudora(String regimenFiscalDeudora) {
+		this.regimenFiscalDeudora = regimenFiscalDeudora;
 	}
 
 }

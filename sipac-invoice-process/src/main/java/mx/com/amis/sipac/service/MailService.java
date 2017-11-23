@@ -2,6 +2,7 @@ package mx.com.amis.sipac.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import mx.com.amis.sipac.invoice.persistence.domain.EstatusFacturacionEnum;
@@ -38,9 +40,21 @@ public class MailService {
 
 	@Autowired private InvoiceOrdersRepository repository;
 
-	public void sendEmail(OrderToInvoice order) throws Exception {
-		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
-		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+	//	public void sendEmail(OrderToInvoice order) throws Exception {
+	//		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
+	//		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+	//	}
+
+	@Async
+	public CompletableFuture<OrderToInvoice> sendEmail(OrderToInvoice order) throws InterruptedException {
+		logger.info("sending email for: " + order);
+		try {
+			List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
+			sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CompletableFuture.completedFuture(order);
 	}
 
 	private String getSubject(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {
