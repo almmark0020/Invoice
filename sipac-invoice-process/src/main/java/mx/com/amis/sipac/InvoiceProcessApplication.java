@@ -20,8 +20,7 @@ public class InvoiceProcessApplication {
 	 * @param args Array of {@link String} with any argument to the application.
 	 */
 	public static void main(String[] args) {
-		// close the application context to shut down the custom ExecutorService
-		SpringApplication.run(InvoiceProcessApplication.class, args).close();
+		SpringApplication.run(InvoiceProcessApplication.class, args);
 	}
 
 	@Bean

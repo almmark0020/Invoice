@@ -62,6 +62,19 @@ public class OrderToInvoice implements Serializable {
 	private Timestamp startSendEmailDate;
 	@Transient
 	private Timestamp endSendEmailDate;
+	
+	public long getTotalTime() {
+	  return endDate.getTime() - startDate.getTime();
+	}
+	public long getTotalProcessTime() {
+	  return endDate.getTime() - startReachcoreDate.getTime();
+	}
+	public long getReachcoreTime() {
+      return endReachCoreDate.getTime() - startReachcoreDate.getTime();
+    }
+	public long getEmailSendTime() {
+      return endDate.getTime() - startSendEmailDate.getTime();
+    }
 
 	// for productivity report
 	private String tipoCaptura;

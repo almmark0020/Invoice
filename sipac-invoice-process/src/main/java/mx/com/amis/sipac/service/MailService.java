@@ -1,6 +1,13 @@
 package mx.com.amis.sipac.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -37,24 +44,83 @@ public class MailService {
 
 	@Value("${emulate.email}")
 	private String emulateEmail;
+	
+	@Value("${local.vault.location}")
+    private String vaultPath;
 
 	@Autowired private InvoiceOrdersRepository repository;
 
-	//	public void sendEmail(OrderToInvoice order) throws Exception {
-	//		List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
-	//		sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
-	//	}
+//		public void sendEmail(OrderToInvoice order) throws Exception {
+//			List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
+//			sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
+//		}
 
 	@Async
 	public CompletableFuture<OrderToInvoice> sendEmail(OrderToInvoice order) throws InterruptedException {
 		logger.info("sending email for: " + order);
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+        order.setStartSendEmailDate(ts);
 		try {
 			List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
 			sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		ts = new Timestamp(System.currentTimeMillis());
+        order.setEndDate(ts);
+        
+        appendTimesLog(order);
+		
 		return CompletableFuture.completedFuture(order);
+	}
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	private void appendTimesLog(OrderToInvoice order) {
+	  String fileName = vaultPath + "/timesLog-" + sdf.format(new Date()) + ".csv";
+	  logger.debug("Logging times at " + fileName);
+	  Writer output = null;
+	  try {
+	    File file = new File(fileName);
+	    if (!file.exists()) {
+	      file.createNewFile();
+	      output = new BufferedWriter(new FileWriter(file, true));
+	      output.append("SINIESTRO_ID,FOLIO,ESTATUS SIPAC,ESTATUS FACTURACION,INICIO,"
+	          + "ENTRADA EN COLA DE MENSAJES,INICIO PROCESO A REACHCORE,FIN PROCESO A REACHCORE,"
+	          + "INICIO ENVIO A EMAIL,FIN,"
+	          + "TIEMPO TOTAL PROCESO, TIEMPO ATENCION, TIEMPO REACHCORE, TIEMPO EMAIL, ERROR \n");
+	    } else {
+	      output = new BufferedWriter(new FileWriter(fileName, true));
+	    }
+	    output.append(order.getSiniestroId() + "," 
+	        + order.getFolio() + "," 
+	        + order.getEstatus() + ","
+	        + EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1].name() + ","
+	        + order.getStartDate() + ","
+	        + order.getQueueDate() + ","
+	        + order.getStartReachcoreDate() + ","
+	        + order.getEndReachCoreDate() + ","
+	        + order.getStartSendEmailDate() + ","
+	        + order.getEndDate() + ",");
+	    if (StringUtils.isBlank(order.getError())) {
+	      output.append( order.getTotalTime() + ",");
+	      output.append( order.getTotalProcessTime() + ",");
+	      output.append( order.getReachcoreTime() + ",");
+	      output.append( order.getEmailSendTime() + ",");
+	    } else {
+	      output.append(" , , , ,");
+	      output.append(order.getError() != null ? order.getError() : " ");
+	    }
+	    output.append(" \n");
+	  }catch (Exception e) {
+	    e.printStackTrace();
+	  } finally {
+	    if (output != null) {
+	      try {
+	        output.close();
+	      } catch (Exception e) { }
+	    }
+	  }
 	}
 
 	private String getSubject(OrderToInvoice order, EstatusFacturacionEnum status) throws Exception {

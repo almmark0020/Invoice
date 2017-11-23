@@ -52,8 +52,13 @@ public class ReceiverConfiguration {
     return new Receiver();
   }
   
-  @Bean
-  public EmailReceiver emailReceiver() {
-	  return new EmailReceiver();
-  }
+//  @Bean
+//  public Receiver receiver2() {
+//    return new Receiver();
+//  }
+  
+//  @Bean
+//  public EmailReceiver emailReceiver() {
+//	  return new EmailReceiver();
+//  }
 }
