@@ -173,13 +173,13 @@ public class Receiver {
     OrderToInvoice order = new Gson().fromJson(message, OrderToInvoice.class);
     order.setStartReachcoreDate(ts);
     order.setInvoiceStatus(status.getEstatusId());
-    String apiKey = repository.getApiKey(order);
-    logger.debug("apikey: " + apiKey);
-    order.setApiKey(apiKey);
     if (repository.isAlreadyInvoiced(order, status)) {
       logger.info("This order was already processed.");
       return null;
     }
+    String apiKey = repository.getApiKey(order);
+    logger.debug("apikey: " + apiKey);
+    order.setApiKey(apiKey);
     if (status == EstatusFacturacionEnum.FACTURA) {
       Long id = registerInvoiceOrder(order);
       order.setInvoiceOrderId(id);
@@ -289,6 +289,13 @@ public class Receiver {
   private Comprobante buildComprobante(OrderToInvoice order) {
     Comprobante compr =  new Comprobante();
     compr.setVersion("3.3");
+    
+    compr.setFolioDua(order.getFolio());
+    compr.setSiniestroAcreedor(order.getSiniestroAcreedor());
+    compr.setSiniestroDeudor(order.getSiniestroDeudor());
+    compr.setSiniestroCorrecto(order.getSiniestroCorrecto());
+    compr.setPolizaAcreedor(order.getPolizaAcreedor());
+    compr.setPolizaDeudor(order.getPolizaDeudor());
 
     compr.setTipoDeComprobante(CTipoDeComprobante.I);
     compr.setMoneda(CMoneda.MXN);
@@ -327,15 +334,15 @@ public class Receiver {
   }
 
   private String getDescription(OrderToInvoice order) {
-    String desc = "INDEMNIZACION DE LA RECUPERACION DE SINIESTROS MODALIDAD SIPAC PERCEPCION DE LA INDEMNIZACION DE LA RECUPRACION ASOCIADA AL : ";
+    String desc = "INDEMNIZACIÓN DE LA RECUPERACIÓN DE SINIESTROS MODALIDAD SIPAC PERCEPCIÓN DE LA INDEMNIZACIÓN DE LA RECUPRACIÓN ASOCIADA AL : ";
     desc += "Siniestro Acreedor: " + order.getSiniestroAcreedor();
-    desc += ", Poliza Acreedor: " + order.getPolizaAcreedor();
+    desc += ", Póliza Acreedor: " + order.getPolizaAcreedor();
     if (!StringUtils.isEmpty(order.getSiniestroCorrecto())) {
       desc += ", Siniestro Correcto: " + order.getSiniestroCorrecto();
     } else {
       desc += ", Siniestro Deudor: " + order.getSiniestroDeudor();
     }
-    desc += ", Poliza Deudor: " + order.getPolizaDeudor();
+    desc += ", Póliza Deudor: " + order.getPolizaDeudor();
     desc += ", Actividad no objeto de IVA";
     return desc;
   }

@@ -51,6 +51,7 @@ public class ReachCoreFacadeTest {
 		String emitUrl = "https://oat.reachcore.com/api/ws/6.0/pacservices/Emision.svc/basic?wsdl";
 		ReachCoreFacade facade = new ReachCoreFacade(emitUrl, apiKey);
 		Comprobante compr = buildMockComprobante33();
+		System.out.println("comprobante XML: " + CfdiUtil.format(compr));
 		EmitirComprobanteResponse resp = facade.emitInvoice(compr);
 		System.out.println("resp: " + resp);
 		
@@ -59,13 +60,18 @@ public class ReachCoreFacadeTest {
 		if (uuid != null) {
 			System.out.println("Emiting payment compliment...");
 			compr = buildMockPaymentComplement(uuid);
+			System.out.println("comprobante XML: " + CfdiUtil.format(compr));
 			resp = facade.emitInvoice(compr);
 			System.out.println("resp: " + resp);
 			processResponse(resp);
 			
-			
 			System.out.println("Emiting credit note...");
 			compr = buildMockCreditNote(uuid);
+			System.out.println("+++++++++++++++++++++++++++++");
+            System.out.println("comprobante XML: " + CfdiUtil.formatCfdiToString(compr));
+            System.out.println("+++++++++++++++++++++++++++++");
+            System.out.println("comprobante XML: " + CfdiUtil.format(compr));
+            System.out.println("+++++++++++++++++++++++++++++");
 			resp = facade.emitInvoice(compr);
 			System.out.println("resp: " + resp);
 			processResponse(resp);
@@ -89,19 +95,19 @@ public class ReachCoreFacadeTest {
 		return null;
 	}
 
-	//  @Test
+//	  @Test
 	public void emitString() throws Exception {
 		String apiKey = "h4kxqr4tdzyfdyga4ezbbnjphabjt8etruqqm6xeqxgucqbt5ne7f3j5gzguun8qerhr56c8tadienvy";
 		String emitUrl = "https://oat.reachcore.com/api/ws/6.0/pacservices/Emision.svc/basic?wsdl";
 		ReachCoreFacade facade = new ReachCoreFacade(emitUrl, apiKey);
-		String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> " + 
-				"<cfdi:ns2:Comprobante Version=\"3.3\" Fecha=\"2017-10-13T00:00:59\" SubTotal=\"15658\" Moneda=\"MXN\" Total=\"15658\" TipoDeComprobante=\"I\" LugarExpedicion=\"66260\" xmlns:cfdi=\"http://www.sat.gob.mx/TimbreFiscalDigital\" xmlns:ns2=\"http://www.sat.gob.mx/cfd/3\"> " + 
-				"    <cfdi:ns2:Emisor Rfc=\"AAA010101AAA\" Nombre=\"ABA SEGUROS, S.A. DE C.V.\" RegimenFiscal=\"601\"/> " + 
-				"    <cfdi:ns2:Receptor Rfc=\"SMS401001573\" Nombre=\"SEGUROS VE POR MAS, S.A. GRUPO FINANCIERO VE POR MAS\" UsoCFDI=\"P01\"/> " + 
-				"    <cfdi:ns2:Conceptos> " + 
-				"        <cfdi:ns2:Concepto ClaveProdServ=\"01010101\" Cantidad=\"1\" ClaveUnidad=\"E48\" Unidad=\"Unidad de Servicio\" Descripcion=\"Percepcion de la indemnizacion de la recuperacion asociada a Siniestro Afectado S13A. Folio F1210-2. Siniestro Responsable S1210-2. Poliza Responsable P12. Poliza Acreedor P76. Siniestro Acreedor S13A. Siniestro correcto \" ValorUnitario=\"15658\" Importe=\"15658\"/> " + 
-				"    </cfdi:ns2:Conceptos> " + 
-				"</cfdi:ns2:Comprobante> ";
+		String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+		    + " <cfdi:Comprobante xmlns:pago10=\"http://www.sat.gob.mx/Pagos\"  Version=\"3.3\" Fecha=\"2017-11-26T19:13:42\" FormaPago=\"03\" SubTotal=\"10\" Moneda=\"MXN\" Total=\"10\" TipoDeComprobante=\"I\" LugarExpedicion=\"08400\" xmlns:cfdi=\"http://www.sat.gob.mx/cfd/3\" xmlns:ns2=\"http://www.sat.gob.mx/TimbreFiscalDigital\">"
+		    + " <cfdi:Emisor Rfc=\"AAA010101AAA\" Nombre=\"ACCEM SERVICIOS EMPRESARIALES SC\" RegimenFiscal=\"601\"/>"
+		    + " <cfdi:Receptor Rfc=\"LOVM840920DI9\" Nombre=\"MARCO ANTONIO LOPEZ VARGAS\" UsoCFDI=\"G03\"/>"
+		    + " <cfdi:Conceptos>"
+		    + " <cfdi:Concepto ClaveProdServ=\"01010101\" Cantidad=\"1\" ClaveUnidad=\"C62\" Unidad=\"Unidad\" Descripcion=\"ok\" ValorUnitario=\"10\" Importe=\"10\"/>"
+		    + " </cfdi:Conceptos>"
+		    + " </cfdi:Comprobante>";
 		System.out.println("xmlString: " + xmlString);
 		EmitirComprobanteResponse resp = facade.emitInvoice(xmlString);
 		System.out.println("resp: " + resp);
@@ -186,8 +192,7 @@ public class ReachCoreFacadeTest {
 		Concepto concepto = new Concepto();
 		concepto.setCantidad(new BigDecimal(1));
 		concepto.setUnidad("Unidad");
-		concepto.setDescripcion("<![CDATA[Tootsie roll tiramisu macaroon wafer áÑ carrot cake. <br />      \r\n" + 
-				" Danish topping sugar plum tart bonbon caramels cake.]]>");
+		concepto.setDescripcion("okokiÖn");
 		concepto.setValorUnitario(new BigDecimal(10));
 		concepto.setImporte(new BigDecimal(10));
 		concepto.setClaveProdServ("01010101");

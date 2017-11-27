@@ -8,6 +8,7 @@
 
 package mx.gob.sat.cfdi.serializer.v33;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -569,6 +570,68 @@ import mx.gob.sat.cfdi.serializer.complemento.timbreFiscal.TimbreFiscalDigital;
 })
 @XmlRootElement(name = "Comprobante")
 public class Comprobante {
+  
+  @XmlTransient
+  private String folioDua;
+  @XmlTransient
+  private String siniestroDeudor;
+  @XmlTransient
+  private String siniestroAcreedor;
+  @XmlTransient
+  private String siniestroCorrecto;
+  @XmlTransient
+  private String polizaDeudor;
+  @XmlTransient
+  private String polizaAcreedor;
+
+  public String getFolioDua() {
+    return folioDua;
+  }
+
+  public void setFolioDua(String folioDua) {
+    this.folioDua = folioDua;
+  }
+
+  public String getSiniestroDeudor() {
+    return siniestroDeudor;
+  }
+
+  public void setSiniestroDeudor(String siniestroDeudor) {
+    this.siniestroDeudor = siniestroDeudor;
+  }
+
+  public String getSiniestroAcreedor() {
+    return siniestroAcreedor;
+  }
+
+  public void setSiniestroAcreedor(String siniestroAcreedor) {
+    this.siniestroAcreedor = siniestroAcreedor;
+  }
+
+  public String getSiniestroCorrecto() {
+    return siniestroCorrecto;
+  }
+
+  public void setSiniestroCorrecto(String siniestroCorrecto) {
+    this.siniestroCorrecto = siniestroCorrecto;
+  }
+
+  public String getPolizaDeudor() {
+    return polizaDeudor;
+  }
+
+  public void setPolizaDeudor(String polizaDeudor) {
+    this.polizaDeudor = polizaDeudor;
+  }
+
+  public String getPolizaAcreedor() {
+    return polizaAcreedor;
+  }
+
+  public void setPolizaAcreedor(String polizaAcreedor) {
+    this.polizaAcreedor = polizaAcreedor;
+  }
+
 
   @XmlElement(name = "CfdiRelacionados")
   protected Comprobante.CfdiRelacionados cfdiRelacionados;

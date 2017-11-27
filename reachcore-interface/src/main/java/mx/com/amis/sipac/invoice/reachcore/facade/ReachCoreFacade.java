@@ -64,8 +64,9 @@ public class ReachCoreFacade {
     Emision emision = new Emision(new URL(url));
     IEmision cliente = emision.getBasicHttpBindingIEmision();
     EmitirComprobanteRequest req = new EmitirComprobanteRequest();
-    String cfdiString = CfdiUtil.formatCfdiToString(compr);
-    logger.debug("xml: " + cfdiString);
+//    String cfdiString = CfdiUtil.formatCfdiToString(compr);
+    String cfdiString = CfdiUtil.format(compr);
+    logger.debug("xmlString: " + cfdiString);
     req.setComprobante(cfdiString);
     return cliente.emitirComprobante(req, apiKey);
   }
