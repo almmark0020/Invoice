@@ -486,11 +486,11 @@ public class Receiver {
     return fileId;
   }
   
-  private String getInvoiceDocName(EstatusFacturacionEnum status, String uuid, String sinAcreedor) {
+  public static String getInvoiceDocName(EstatusFacturacionEnum status, String uuid, String sinAcreedor) {
 	  return getFilePrefix(status) + "_SINACREEDOR_" + sinAcreedor + "_" + uuid;
   }
   
-  private String getFilePrefix(EstatusFacturacionEnum status) {
+  private static String getFilePrefix(EstatusFacturacionEnum status) {
 	  switch(status) {
 	  case FACTURA:
 		  return "F";
