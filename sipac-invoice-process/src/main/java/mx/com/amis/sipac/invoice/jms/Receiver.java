@@ -334,7 +334,7 @@ public class Receiver {
   }
 
   private String getDescription(OrderToInvoice order) {
-    String desc = "INDEMNIZACIÓN DE LA RECUPERACIÓN DE SINIESTROS MODALIDAD SIPAC PERCEPCIÓN DE LA INDEMNIZACIÓN DE LA RECUPRACIÓN ASOCIADA AL : ";
+    String desc = "INDEMNIZACIÓN DE LA RECUPERACIÓN DE SINIESTROS MODALIDAD SIPAC PERCEPCIÓN DE LA INDEMNIZACIÓN DE LA RECUPERACIÓN ASOCIADA AL : ";
     desc += "Siniestro Acreedor: " + order.getSiniestroAcreedor();
     desc += ", Póliza Acreedor: " + order.getPolizaAcreedor();
     if (!StringUtils.isEmpty(order.getSiniestroCorrecto())) {
@@ -366,7 +366,7 @@ public class Receiver {
     compl.setVersion("1.0");
     Pago paymt = new Pago();
     paymt.setFechaPago(CfdiUtil.getXMLGregorianCalendar());
-    paymt.setFormaDePagoP("01");
+    paymt.setFormaDePagoP("03");
     paymt.setMonedaP(CMoneda.MXN);
     paymt.setMonto(new BigDecimal(order.getMonto()));
     DoctoRelacionado doc = new DoctoRelacionado();
@@ -405,7 +405,7 @@ public class Receiver {
     Comprobante compr = CfdiUtil.getComprobanteFromXml(resp.getResult());
     byte[] pdf = retrievePdf(order.getApiKey(), compr.getUUID());
 
-    String fileId = createVaultFiles(compr.getUUID(), resp.getResult().getBytes(), pdf);
+    String fileId = createVaultFiles(status, compr.getUUID(), order.getSiniestroAcreedor(), resp.getResult().getBytes(), pdf);
     mov.setCfdiXml(fileId + ".xml");
     mov.setCfdiPdf(fileId + ".pdf");
 
@@ -427,14 +427,20 @@ public class Receiver {
     mov.setFacEstatusFacturacion(new FacEstatusFacturacion(status.getEstatusId()));
     mov.setFechaMovimiento(new Timestamp(new Date().getTime()));
     mov.setUuid(order.getId());
+    
+    byte[] acuse = null;
+    if (acuseSAT != null) {
+        acuse = acuseSAT.getBytes(StandardCharsets.UTF_8);
+        String fileId = createVaultFiles(status, order.getId(), order.getSiniestroAcreedor(), acuse);
+        mov.setCfdiXml(fileId + "-acuseSAT.xml");
+    }
+    byte[] pdf = retrievePdf(order.getApiKey(), order.getId());
+    
     mov = repository.registerInvoiceMovement(order, mov);
     order.setPdf(this.retrievePdf(order.getApiKey(), order.getId()));
     order.setXml(this.retrieveXml(order.getApiKey(), order.getId()));
-    if (acuseSAT != null) {
-      byte[] acuse = acuseSAT.getBytes(StandardCharsets.UTF_8);
-      createVaultFiles(order.getId(), acuse);
-      order.setAcuseSAT(acuse);
-    }
+    order.setAcuseSAT(acuse);
+    order.setPdf(pdf);
     return order;
   }
 
@@ -459,8 +465,8 @@ public class Receiver {
     return facade.getXml(uuid).getContents();
   }
 
-  private String createVaultFiles(String uuid, byte[] xml, byte[] pdf) {
-    String fileId = vaultPath + File.separatorChar + uuid;
+  private String createVaultFiles(EstatusFacturacionEnum status, String uuid, String sinAcreedor, byte[] xml, byte[] pdf) {
+    String fileId = vaultPath + File.separatorChar + getInvoiceDocName(status, uuid, sinAcreedor);
     try {
       FileUtils.writeByteArrayToFile(new File(fileId + ".xml"), xml);
       FileUtils.writeByteArrayToFile(new File(fileId + ".pdf"), pdf);
@@ -470,13 +476,32 @@ public class Receiver {
     return fileId;
   }
 
-  private String createVaultFiles(String uuid, byte[] acuseSAT) {
-    String fileId = vaultPath + File.separatorChar + uuid;
+  private String createVaultFiles(EstatusFacturacionEnum status, String uuid, String sinAcreedor, byte[] acuseSAT) {
+    String fileId = vaultPath + File.separatorChar + getInvoiceDocName(status, uuid, sinAcreedor);
     try {
       FileUtils.writeByteArrayToFile(new File(fileId + "-acuseSAT.xml"), acuseSAT);
     } catch (IOException e) {
       e.printStackTrace();
     }
     return fileId;
+  }
+  
+  private String getInvoiceDocName(EstatusFacturacionEnum status, String uuid, String sinAcreedor) {
+	  return getFilePrefix(status) + "_SINACREEDOR_" + sinAcreedor + "_" + uuid;
+  }
+  
+  private String getFilePrefix(EstatusFacturacionEnum status) {
+	  switch(status) {
+	  case FACTURA:
+		  return "F";
+	  case CANCELACION:
+		  return "C";
+	  case NOTA_CREDITO:
+		  return "NC";
+	  case COMPLEMENTO:
+		  return "CP";
+	  default:
+		  return StringUtils.EMPTY;
+	  }
   }
 }

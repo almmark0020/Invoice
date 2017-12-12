@@ -142,7 +142,7 @@ public class QuartzConfiguration {
     stFactory.setGroup("mygroup6");
 //    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
 //    stFactory.setCronExpression("0 */12 * * * ?"); // every twelve hours
-    stFactory.setCronExpression("0 1 5 * * ?"); // every day at 7:00 am
+    stFactory.setCronExpression("0 2 5 * * ?"); // every day at 7:00 am
 //    stFactory.setCronExpression("0 1 11 * * ?"); // every day at 7:00 am
     return stFactory;
   }  
@@ -164,7 +164,7 @@ public class QuartzConfiguration {
     stFactory.setGroup("mygroup6_Aux");
 //    stFactory.setCronExpression("0 0/1 * * * ?"); // every minute
 //    stFactory.setCronExpression("0 */12 * * * ?"); // every twelve hours
-    stFactory.setCronExpression("0 13 2 * * ?"); // every day at 7:00 am
+    stFactory.setCronExpression("0 30 15 * * ?"); // every day at 7:00 am
 //    stFactory.setCronExpression("0 1 11 * * ?"); // every day at 7:00 am
     return stFactory;
   }  

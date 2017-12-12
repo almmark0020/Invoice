@@ -235,7 +235,7 @@ public class ReachCoreFacadeTest {
 		compl.setVersion("1.0");
 		Pago paymt = new Pago();
 		paymt.setFechaPago(CfdiUtil.getXMLGregorianCalendar());
-		paymt.setFormaDePagoP("01");
+		paymt.setFormaDePagoP("03");
 		paymt.setMonedaP(CMoneda.MXN);
 		paymt.setMonto(new BigDecimal(1));
 		DoctoRelacionado doc = new DoctoRelacionado();

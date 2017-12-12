@@ -137,29 +137,29 @@ public class InvoiceOrdersRepository {
     return fields;
   }
 
-  @SuppressWarnings("unchecked")
-  public List<EmailToNotify> getEmails(long companiaAcr, long companiaDeu) {
-    String queryString = "select ID_USUARIO as \"id\", "
-        + " NOMBRE_USUARIO as \"username\", "
-        + " CORREO_ELECTRONICO as \"email\" "
-        + " from FAC_USUARIO"
-        + " where ID_COMPANIA in (" + companiaAcr + ", " + companiaDeu + ") "
-        + " and NOTIFICAR_EMAIL = 1 and ACTIVO = 1 ";
-    Query q = em.createNativeQuery (queryString, EmailToNotify.class);
-    return q.getResultList();
-  }
+//  @SuppressWarnings("unchecked")
+//  public List<EmailToNotify> getEmails(long companiaAcr, long companiaDeu) {
+//    String queryString = "select ID_USUARIO as \"id\", "
+//        + " NOMBRE_USUARIO as \"username\", "
+//        + " CORREO_ELECTRONICO as \"email\" "
+//        + " from FAC_USUARIO"
+//        + " where ID_COMPANIA in (" + companiaAcr + ", " + companiaDeu + ") "
+//        + " and NOTIFICAR_EMAIL = 1 and ACTIVO = 1 ";
+//    Query q = em.createNativeQuery (queryString, EmailToNotify.class);
+//    return q.getResultList();
+//  }
 
-  //	@SuppressWarnings("unchecked")
-  //	public List<EmailToNotify> getEmails(long companiaAcr, long companiaDeu) {
-  //		String queryString = "select USUARIO_ID as \"id\", "
-  //				+ " LOGIN_USUARIO as \"username\", "
-  //				+ " EMAIL as \"email\" "
-  //				+ " from USUARIOS"
-  //				+ " where CIA_ID in (" + companiaAcr + ", " + companiaDeu + ") "
-  //				+ " and NOTIFICAR_EMAIL = 1 and ESTATUS = 'A' ";
-  //		Query q = em.createNativeQuery (queryString, EmailToNotify.class);
-  //		return q.getResultList();
-  //	}
+  	@SuppressWarnings("unchecked")
+  	public List<EmailToNotify> getEmails(long companiaAcr, long companiaDeu) {
+  		String queryString = "select USUARIO_ID as \"id\", "
+  				+ " LOGIN_USUARIO as \"username\", "
+  				+ " EMAIL as \"email\" "
+  				+ " from USUARIOS"
+  				+ " where CIA_ID in (" + companiaAcr + ", " + companiaDeu + ") "
+  				+ " and NOTIFICAR_EMAIL = '1' and ESTATUS = 'A' ";
+  		Query q = em.createNativeQuery (queryString, EmailToNotify.class);
+  		return q.getResultList();
+  	}
 
   private List<String> getAcceptedStatus() {
     List<String> statusList = new ArrayList<String>();
