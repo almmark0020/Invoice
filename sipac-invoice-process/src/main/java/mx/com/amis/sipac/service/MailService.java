@@ -25,7 +25,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import mx.com.amis.sipac.invoice.jms.Receiver;
 import mx.com.amis.sipac.invoice.persistence.domain.EstatusFacturacionEnum;
 import mx.com.amis.sipac.invoice.persistence.model.EmailToNotify;
 import mx.com.amis.sipac.invoice.persistence.model.OrderToInvoice;
@@ -63,8 +62,8 @@ public class MailService {
         order.setStartSendEmailDate(ts);
         try {
             List<EmailToNotify> emails = repository.getEmails(order.getCiaAcreedora(), order.getCiaDeudora());
-            String fileNames = Receiver.getInvoiceDocName(EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1], order.getId(), order.getSiniestroAcreedor());
-            sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT(), fileNames);
+            //String fileNames = Receiver.getInvoiceDocName(EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1], order.getId(), order.getSiniestroAcreedor());
+            sendMessageWithAttachment(emails, getSubject(order, EstatusFacturacionEnum.values()[order.getInvoiceStatus() - 1]), builEmailBody(order), order.getXml(), order.getPdf(), order.getAcuseSAT(), order.getFilesName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -244,7 +243,7 @@ public class MailService {
         helper.setSubject(subject);
         helper.setText(text, true);
 
-        logger.debug("xml to attach: " + xml);
+        logger.debug("file to attach: " + fileNames);
 
         if (pdf != null) {
             helper.addAttachment(fileNames + ".pdf", new ByteArrayResource(pdf));
@@ -253,7 +252,7 @@ public class MailService {
             helper.addAttachment(fileNames + ".xml", new ByteArrayResource(xml));
         }
         if (acuseSAT != null) {
-            helper.addAttachment(fileNames + "-AcuseSAT.xml", new ByteArrayResource(acuseSAT));
+            helper.addAttachment(fileNames + "-acuse.xml", new ByteArrayResource(acuseSAT));
         }
 
         for (int i = 0; i < 5; i++) {

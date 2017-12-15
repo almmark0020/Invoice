@@ -3,6 +3,7 @@ package mx.com.amis.sipac.invoice.jms;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -296,6 +297,7 @@ public class Receiver {
     compr.setSiniestroCorrecto(order.getSiniestroCorrecto());
     compr.setPolizaAcreedor(order.getPolizaAcreedor());
     compr.setPolizaDeudor(order.getPolizaDeudor());
+    compr.setMetodoPago(CMetodoPago.PPD);
 
     compr.setTipoDeComprobante(CTipoDeComprobante.I);
     compr.setMoneda(CMoneda.MXN);
@@ -334,7 +336,7 @@ public class Receiver {
   }
 
   private String getDescription(OrderToInvoice order) {
-    String desc = "INDEMNIZACIÓN DE LA RECUPERACIÓN DE SINIESTROS MODALIDAD SIPAC PERCEPCIÓN DE LA INDEMNIZACIÓN DE LA RECUPERACIÓN ASOCIADA AL : ";
+    String desc = "PERCEPCIÓN DE LA INDEMNIZACIÓN DE LA RECUPERACIÓN CONFORME AL CONVENIO SIPAC ASOCIADA AL : ";
     desc += "Siniestro Acreedor: " + order.getSiniestroAcreedor();
     desc += ", Póliza Acreedor: " + order.getPolizaAcreedor();
     if (!StringUtils.isEmpty(order.getSiniestroCorrecto())) {
@@ -372,10 +374,11 @@ public class Receiver {
     DoctoRelacionado doc = new DoctoRelacionado();
     doc.setIdDocumento(order.getId());
     doc.setMonedaDR(CMoneda.MXN);
-    doc.setMetodoDePagoDR(CMetodoPago.PUE);
+    doc.setMetodoDePagoDR(CMetodoPago.PPD);
     doc.setImpSaldoAnt(new BigDecimal(order.getMonto()));
     doc.setImpPagado(new BigDecimal(order.getMonto()));
     doc.setImpSaldoInsoluto(new BigDecimal(0));
+    doc.setNumParcialidad(BigInteger.valueOf(1));
     paymt.getDoctoRelacionado().add(doc);
     compl.getPago().add(paymt);
 
@@ -418,6 +421,7 @@ public class Receiver {
 
     order.setPdf(pdf);
     order.setXml(resp.getResult().getBytes());
+    order.setFilesName(getInvoiceDocName(status, compr.getUUID(), order.getSiniestroAcreedor()));
     return order;
   }
 
@@ -441,6 +445,7 @@ public class Receiver {
     order.setXml(this.retrieveXml(order.getApiKey(), order.getId()));
     order.setAcuseSAT(acuse);
     order.setPdf(pdf);
+    order.setFilesName(getInvoiceDocName(status, order.getId(), order.getSiniestroAcreedor()));
     return order;
   }
 
@@ -486,11 +491,11 @@ public class Receiver {
     return fileId;
   }
   
-  public static String getInvoiceDocName(EstatusFacturacionEnum status, String uuid, String sinAcreedor) {
+  private String getInvoiceDocName(EstatusFacturacionEnum status, String uuid, String sinAcreedor) {
 	  return getFilePrefix(status) + "_SINACREEDOR_" + sinAcreedor + "_" + uuid;
   }
   
-  private static String getFilePrefix(EstatusFacturacionEnum status) {
+  private String getFilePrefix(EstatusFacturacionEnum status) {
 	  switch(status) {
 	  case FACTURA:
 		  return "F";

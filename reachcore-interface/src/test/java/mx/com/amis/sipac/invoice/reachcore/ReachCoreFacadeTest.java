@@ -2,6 +2,7 @@ package mx.com.amis.sipac.invoice.reachcore;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.xml.bind.JAXBException;
 
@@ -159,6 +160,7 @@ public class ReachCoreFacadeTest {
 		compr.setTotal(new BigDecimal(10));
 		compr.setLugarExpedicion("08400");
 		compr.setFormaPago("03");
+		compr.setMetodoPago(CMetodoPago.PPD);
 
 		Emisor emisor = new Emisor();
 		emisor.setRfc("AAA010101AAA");
@@ -241,10 +243,11 @@ public class ReachCoreFacadeTest {
 		DoctoRelacionado doc = new DoctoRelacionado();
 		doc.setIdDocumento(uuid);
 		doc.setMonedaDR(CMoneda.MXN);
-		doc.setMetodoDePagoDR(CMetodoPago.PUE);
+		doc.setMetodoDePagoDR(CMetodoPago.PPD);
 		doc.setImpSaldoAnt(new BigDecimal(1));
 		doc.setImpPagado(new BigDecimal(1));
 		doc.setImpSaldoInsoluto(new BigDecimal(0));
+		doc.setNumParcialidad(BigInteger.valueOf(1));
 		paymt.getDoctoRelacionado().add(doc);
 		compl.getPago().add(paymt);
 

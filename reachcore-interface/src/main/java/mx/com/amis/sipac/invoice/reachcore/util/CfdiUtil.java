@@ -112,6 +112,9 @@ public class CfdiUtil {
     if (compr.getTipoDeComprobante() != CTipoDeComprobante.P) {
       xmlString += "     FormaPago=\"" + compr.getFormaPago() + "\" ";
     }
+    if (compr.getTipoDeComprobante() == CTipoDeComprobante.I) {
+        xmlString += "     MetodoPago=\"" + compr.getMetodoPago() + "\" ";
+    }
     xmlString += "     SubTotal=\"" + compr.getSubTotal() + "\" "
         + "     Moneda=\"" + compr.getMoneda().value() + "\" "
         + "     Total=\"" + compr.getTotal() + "\" "
@@ -164,6 +167,7 @@ public class CfdiUtil {
           + "   MetodoDePagoDR=\"" + doc.getMetodoDePagoDR().value() + "\" "
           + "   ImpSaldoAnt=\"" + doc.getImpSaldoAnt() + "\" "
           + "   ImpPagado=\"" + doc.getImpPagado() + "\" "
+          + "	NumParcialidad=\"" + doc.getNumParcialidad() + "\" "
           + "   ImpSaldoInsoluto=\"" + doc.getImpSaldoInsoluto() + "\" />"
           + " </pago10:Pago>"
           + " </pago10:Pagos></cfdi:Complemento>";
@@ -172,8 +176,10 @@ public class CfdiUtil {
     xmlString += "<cfdi:Addenda><ad:orden xmlns:ad=\"http://www.sipac.com.mx\">"
         + "   <ad:datos>"
         + "       <ad:folioDua>" + compr.getFolioDua() + "</ad:folioDua>";
-    if (compr.getSiniestroCorrecto() != null) {
+    if (compr.getSiniestroCorrecto() != null && !compr.getSiniestroCorrecto().trim().equals("")) {
       xmlString += "       <ad:siniestroCorrecto>" + compr.getSiniestroCorrecto() + "</ad:siniestroCorrecto>";
+    } else {
+    	xmlString += "       <ad:siniestroCorrecto>" + compr.getSiniestroDeudor() + "</ad:siniestroCorrecto>";
     }
     xmlString += "       <ad:siniestroDeudor>" + compr.getSiniestroDeudor() + "</ad:siniestroDeudor>"
         + "       <ad:siniestroAcreedor>" + compr.getSiniestroAcreedor() + "</ad:siniestroAcreedor>"

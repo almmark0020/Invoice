@@ -63,6 +63,9 @@ public class OrderToInvoice implements Serializable {
 	@Transient
 	private Timestamp endSendEmailDate;
 	
+	@Transient
+	private String filesName;
+	
 	public long getTotalTime() {
 	  return endDate.getTime() - startDate.getTime();
 	}
@@ -455,5 +458,11 @@ public class OrderToInvoice implements Serializable {
 	}
 	public void setFechaPrimerRechazo(Timestamp fechaPrimerRechazo) {
 		this.fechaPrimerRechazo = fechaPrimerRechazo;
+	}
+	public String getFilesName() {
+		return filesName;
+	}
+	public void setFilesName(String filesName) {
+		this.filesName = filesName;
 	}
 }
