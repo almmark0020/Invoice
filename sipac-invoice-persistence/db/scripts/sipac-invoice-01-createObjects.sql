@@ -81,6 +81,46 @@ CREATE TABLE FAC_ORDEN_FACTURADA
 	CIA_ACREEDORA int NOT NULL,
 	FECHA_ESTATUS_SIPAC datetime NOT NULL,
 	ESTATUS_SIPAC varchar NOT NULL,
+	SINIESTRO_ACREEDOR    varchar(20) null,
+	SINIESTRO_DEUDOR    varchar(20) null,
+	SINIESTRO_CORRECTO    varchar(20) null,
+	ORIGEN        char(1)   null,
+	POLIZA_ACREEDOR     varchar(20) null,
+	POLIZA_DEUDOR     varchar(20) null,
+	MONTO       money   null,   
+	NOMBRE_CIA_ACREEDORA    varchar(18) null,
+	RFC_ACREEDORA     varchar(14) null,
+	RAZON_SOCIAL_ACREEDORA    varchar(100)  null,
+	REGIMEN_FISCAL_ACREEDORA  varchar(4)  null,
+	CP_ACREEDORA      varchar(6)  null,
+	NOMBRE_CIA_DEUDORA    varchar(18) null,
+	RFC_DEUDORA     varchar(14) null,
+	RAZON_SOCIAL_DEUDORA    varchar(100)  null,
+	REGIMEN_FISCAL_DEUDORA    varchar(4)  null,
+	TIPO_CAPTURA char(1) null,
+	FECHA_REGISTRO datetime  null,
+	FECHA_ACEPTACION datetime null,
+	FECHA_PAGO datetime null,
+	COSTO money null,
+	FECHA_EXPEDICION datetime null,
+	FECHA_SINIESTRO datetime null,
+	ESTADO int null,
+	MUNICIPIO int null,
+	SANCION money null, 
+	CONTRAPARTE varchar(90),
+	DIAS int null,
+	MOTIVO int null,
+	OBSERVACIONES_ACREEDOR varchar(255) null,
+	OBSERVACIONES_DEUDOR varchar(255) null,
+	OBSERVACIONES_COMITE varchar(255) null,
+	CIRCUNSTANCIA_DEUDOR int null,
+	CIRCUNSTANCIA_ACREEDOR int null,
+	CAPTURADO varchar(255) null,
+	MODIFICADO varchar(255) null,
+	TIPO_TRANSPORTE_DEUDOR int null,
+	TIPO_TRANSPORTE_ACREEDOR int null,
+	FECHA_CONFIRMACION_PAGO datetime null,
+	FECHA_PRIMER_RECHAZO datetime null,
 	constraint PK_FAC_ORDEN_FACTURADA primary key (ID_ORDEN_FACTURADA)
 );
 
@@ -150,7 +190,6 @@ create table FAC_ORDEN_A_FACTURAR (
   FOLIO_ORDEN     varchar(25) not null,
   ESTATUS_ID      char(1)   not null,
   FECHA_ESTATUS     datetime  not null,
-
   SINIESTRO_ACREEDOR    varchar(20) null,
   SINIESTRO_DEUDOR    varchar(20) null,
   SINIESTRO_CORRECTO    varchar(20) null,
@@ -158,23 +197,43 @@ create table FAC_ORDEN_A_FACTURAR (
   POLIZA_ACREEDOR     varchar(20) null,
   POLIZA_DEUDOR     varchar(20) null,
   MONTO       money   null,   
-  TIPO_ORDEN      char(1)   null,
-
+  TIPO_ORDEN      char(1)   null, 
   CIA_ACREEDORA         int   null,   
   NOMBRE_CIA_ACREEDORA    varchar(18) null,
   RFC_ACREEDORA     varchar(14) null,
   RAZON_SOCIAL_ACREEDORA    varchar(100)  null,
   REGIMEN_FISCAL_ACREEDORA  varchar(4)  null,
   CP_ACREEDORA      varchar(6)  null,
-
   CIA_DEUDORA     int   null,
   NOMBRE_CIA_DEUDORA    varchar(18) null,
   RFC_DEUDORA     varchar(14) null,
   RAZON_SOCIAL_DEUDORA    varchar(100)  null,
   REGIMEN_FISCAL_DEUDORA    varchar(4)  null,
-
   ID_ESTATUS_FACTURACION    int   null,
-
+  TIPO_CAPTURA char(1) null,
+  FECHA_REGISTRO datetime  null,
+  FECHA_ACEPTACION datetime null,
+  FECHA_PAGO datetime null,
+  COSTO money null,
+  FECHA_EXPEDICION datetime null,
+  FECHA_SINIESTRO datetime null,
+  ESTADO int null,
+  MUNICIPIO int null,
+  SANCION money null, 
+  CONTRAPARTE varchar(90),
+  DIAS int null,
+  MOTIVO int null,
+  OBSERVACIONES_ACREEDOR varchar(255) null,
+  OBSERVACIONES_DEUDOR varchar(255) null,
+  OBSERVACIONES_COMITE varchar(255) null,
+  CIRCUNSTANCIA_DEUDOR int null,
+  CIRCUNSTANCIA_ACREEDOR int null,
+  CAPTURADO varchar(255) null,
+  MODIFICADO varchar(255) null,
+  TIPO_TRANSPORTE_DEUDOR int null,
+  TIPO_TRANSPORTE_ACREEDOR int null,
+  FECHA_CONFIRMACION_PAGO datetime null,
+  FECHA_PRIMER_RECHAZO datetime null,
   constraint PK_FAC_ORDEN_A_FACTURAR primary key (SINIESTRO_ID, FOLIO_ORDEN, ESTATUS_ID, FECHA_ESTATUS)
 );
 
@@ -214,8 +273,8 @@ ALTER TABLE FAC_USUARIO_BITACORA
 ADD constraint FK_FAC_USUARIO_BIT_USUARIO foreign key (ID_USUARIO_REGISTRO) references FAC_USUARIO (ID_USUARIO);
 
 ALTER TABLE FAC_COMPANIA_APIKEY
-ADD constraint FK_FAC_APIKEY_USUARIO foreign key (ID_USUARIO_REGISTRO) references FAC_USUARIO (ID_USUARIO);
+ADD constraint FK_FAC_APIKEY_USUARIO foreign key (ID_USUARIO_REGISTRO) references USUARIOS (USUARIO_ID);
 
 ALTER TABLE FAC_PERIODO_EXTEMPORANEO
-ADD constraint FK_FAC_PERIODO_USUARIO foreign key (ID_USUARIO_REGISTRO) references FAC_USUARIO (ID_USUARIO);
+ADD constraint FK_FAC_PERIODO_USUARIO foreign key (ID_USUARIO_REGISTRO) references USUARIOS (USUARIO_ID);
 
